@@ -1,0 +1,135 @@
+{
+  "me": {
+    "name": "홍길동",
+    "role": "marketer",
+    "title": "마케팅팀 콘텐츠 매니저",
+    "functions": ["content", "social"],
+    "approval_mode": "per_item",
+    "publish_scope": [
+      "plan_content",
+      "draft_content",
+      "draft_comment",
+      "create_brief"
+    ],
+    "escalate_rules": [
+      "월 광고 예산 상한 초과",
+      "브랜드 포지셔닝·핵심 메시지 변경",
+      "가격·프로모션 조건 변경",
+      "경쟁사 직접 언급·비교 광고",
+      "고객사 실명·사례 공개"
+    ],
+    "reports_to": "",
+    "timezone": "Asia/Seoul"
+  },
+  "brand": {
+    "name": "우리 브랜드",
+    "one_liner": "무엇을, 누구에게, 왜 좋은지 한 줄",
+    "primary_goal": "revenue",
+    "goal_note": "revenue | leads | signup | awareness | launch | retention 중 하나만 — 우선순위를 강제한다"
+  },
+  "offerings": [
+    {
+      "name": "대표 상품 A",
+      "price": 0,
+      "margin_rate": 0.0,
+      "note": "margin_rate(마진율 0~1)가 없으면 손익분기 ROAS·허용 CAC 계산이 막혀 기회 제안이 '확인 필요'로 격하된다"
+    }
+  ],
+  "economics": {
+    "breakeven_roas_formula": "1 / margin_rate",
+    "allowed_cac_formula": "객단가(또는 LTV) x margin_rate",
+    "min_test_budget_multiple": 15,
+    "min_test_budget_note": "허용 CAC x 10~20 (전환 10~20건은 봐야 판정 가능)"
+  },
+  "channels": {
+    "active": ["blog"],
+    "wanted": ["instagram"],
+    "communities": [],
+    "accounts": {
+      "instagram": "",
+      "tiktok": "",
+      "blog": ""
+    }
+  },
+  "cadence": {
+    "quality_bar_required": true,
+    "no_volume_targets": true,
+    "post_rhythm_note": "편수 목표가 아니라 리듬 — 퀄리티 바 미달이면 게시 대신 보강 큐로",
+    "organic_review_days": 7,
+    "ads_verdict_days": 5,
+    "signal_ttl_days": 21,
+    "meme_ttl_days": 7,
+    "fatigue_days": 14
+  },
+  "ads": {
+    "enabled": false,
+    "monthly_budget_cap": 0,
+    "daily_budget_cap": 0,
+    "require_stop_condition": true,
+    "auto_launch": false,
+    "auto_launch_note": "true여도 집행 개시·예산 증액은 approval_mode를 따른다. 무인 실행에서는 절대 자동 집행하지 않는다",
+    "readiness_required": ["conversion_event", "landing", "margin", "offer"]
+  },
+  "policy": {
+    "country": "KR",
+    "disclosure_required": true,
+    "disclosure_note": "협찬·광고·경제적 이해관계는 반드시 표시(표시광고법·추천보증심사지침). 소속을 숨긴 제품 추천 모드는 존재하지 않는다",
+    "community_autopost": false,
+    "sns_autopost": false,
+    "claims_ledger_required": true
+  },
+  "imagefactory": {
+    "enabled": false,
+    "account_email": "",
+    "brand_assets_dir": "",
+    "order_approval": "per_item",
+    "utm_source": "marketing-copilot",
+    "adops_enabled": false,
+    "adops_note": "런타임에 가용성 확인 — 안 열려 있으면 매체별 세팅 가이드로 자동 폴백"
+  },
+  "sources": {
+    "use_web": true,
+    "use_ga4": false,
+    "use_search_console": false,
+    "use_ads_accounts": false,
+    "use_sns_insights": false,
+    "use_sales_data": false,
+    "use_slack": false,
+    "use_notion": false,
+    "manual_performance_input": true
+  },
+  "delivery": {
+    "team": {
+      "enabled": false,
+      "slack_channel": "",
+      "slack_webhook": ""
+    },
+    "private": {
+      "enabled": true,
+      "slack_channel": "",
+      "slack_webhook": ""
+    }
+  },
+  "brief": {
+    "morning_schedule": "0 9 * * 1-5",
+    "weekly_schedule": "0 10 * * 1",
+    "monthly_schedule": "0 10 1 * *",
+    "language": "ko",
+    "routine_enabled": false
+  },
+  "proactive": {
+    "enabled": true,
+    "prompt_nudge": true,
+    "review_on_save": true,
+    "end_check": true
+  },
+  "links": {
+    "business_copilot_home": "~/.business-copilot",
+    "sales_copilot_home": "~/.sales-copilot",
+    "pm_copilot_home": "~/.pm-copilot",
+    "use_business_context": true
+  },
+  "setup": {
+    "completed": false
+  }
+}

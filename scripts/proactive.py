@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""SessionStart 훅 — AI 마케팅 운영자가 시키지 않아도 '오늘 돌려야 할 루프'부터 먼저 짚는다.
+stdout이 세션 컨텍스트로 주입되어 클로드가 먼저 언급한다(PLAN §9 선제 훅 4종).
+
+짚는 것: ① 지난 세션이 남긴 성과 미기록 경고(측정 없는 게시 금지) ② 오늘 큐 미생성
+③ 유효기간 임박·경과 신호·기회 ④ 미회신 핸드오프 ⑤ 소재 피로도 임박.
+짚을 게 없으면 아무 것도 출력하지 않는다(소음 금지).
+
+원칙: 마진·원가·예산 상한·미공개 캠페인 같은 민감 원문은 노출하지 않는다(건수·라벨만).
+user-scope라 모든 프로젝트에서 뜨므로 proactive.enabled=false 로 끌 수 있다.
+"""
+import datetime
+import json
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from common import (  # noqa: E402
+    HANDOFF_INBOX, HANDOFF_OUTBOX, PENDING_UNMEASURED, QUEUE_DIR,
+    emit_context, load_config, looks_private,
+)
+
+HANDOFF_EXT = (".md", ".txt", ".json")
+
+
+def _safe(label):
+    """민감 원문(마진·원가·예산 상한 등)이 섞인 라벨은 세션 컨텍스트에 그대로 흘리지 않는다."""
+    s = str(label or "").strip()
+    if not s:
+        return "(제목 없음)"
+    if looks_private(s):
+        return "(비공개 항목)"
+    return s if len(s) <= 34 else s[:33] + "…"
+
+
+def _lib(fn, *args, **kwargs):
+    """library.py 조회를 방어적으로 호출한다(파일 없음·손상·병렬 제작 중이면 빈 목록)."""
+    try:
+        import library  # noqa: PLC0415
+        return list(getattr(library, fn)(*args, **kwargs) or [])
+    except Exception:
+        return []
+
+
+def _pending_unmeasured():
+    """지난 세션 종료 때 남긴 '성과 기록 슬롯 없는 게시물' 인계 메모.
+    읽으면 삭제한다(1회성 — '측정 없는 게시 금지'를 세션 간에 이어주는 장치)."""
+    if not os.path.exists(PENDING_UNMEASURED):
+        return None
+    note = None
+    try:
+        with open(PENDING_UNMEASURED, encoding="utf-8") as f:
+            raw = f.read().strip()
+        try:
+            d = json.loads(raw)
+            note = (int(d.get("count", 0)), [str(x) for x in d.get("top", [])][:5])
+        except Exception:
+            if raw:  # 구형·손상 파일도 첫 줄은 살린다
+                note = (0, [raw.splitlines()[0][:120]])
+    except Exception:
+        note = None
+    try:
+        os.remove(PENDING_UNMEASURED)
+    except Exception:
+        pass
+    return note
+
+
+def _unreplied_handoffs():
+    """handoffs/inbox 에 들어왔는데 outbox 에 회신 흔적이 없는 계약서(PLAN §8).
+    판정: inbox 파일명(확장자 제외)이 outbox 파일명 어디에도 안 나오면 미회신."""
+    try:
+        names = [f for f in sorted(os.listdir(HANDOFF_INBOX))
+                 if f.lower().endswith(HANDOFF_EXT) and not f.startswith(".")]
+    except OSError:
+        return []
+    try:
+        outbox = " ".join(os.listdir(HANDOFF_OUTBOX)).lower()
+    except OSError:
+        outbox = ""
+    out = []
+    for fn in names:
+        stem = os.path.splitext(fn)[0]
+        if stem.lower() and stem.lower() in outbox:
+            continue
+        out.append(stem)
+    return out
+
+
+def _nudges(cfg):
+    today = datetime.date.today().isoformat()
+    out = []
+
+    # ⓪ 설정 파일은 있는데 온보딩이 안 끝난 경우 — 마진 없으면 돈 계산이 통째로 죽는다(PLAN §13-7)
+    if cfg.get("setup", {}).get("completed") is False:
+        out.append("설정이 아직 안 끝났습니다 — 브랜드·상품·**마진율**부터 채웁니다. "
+                   "마진이 없으면 손익분기·허용 CAC 계산이 막혀 기회 제안이 전부 '확인 필요'로 "
+                   "격하됩니다. ('/setup')")
+
+    # ① 지난 세션이 남긴 성과 미기록 경고 — 숫자부터, 가장 먼저 짚는다(내부 1순위 KPI)
+    pending = _pending_unmeasured()
+    if pending:
+        cnt, top = pending
+        head = f"어제 성과 기록 없이 남은 게시물 {cnt}건" if cnt else "어제 성과 기록 없이 남은 게시물"
+        tail = f" (예: {' / '.join(_safe(t) for t in top[:2])})" if top else ""
+        out.append(f"{head} — 측정 없는 게시는 반복 노동입니다. 지금 기록합니다.{tail} ('/analyze')")
+    else:
+        miss = _lib("unmeasured")
+        if miss:
+            out.append(f"성과 미기록 게시물 {len(miss)}건 — 측정 없는 게시 금지. 오늘 안에 성과를 "
+                       f"기록하고 메시지 ID에 귀속시킵니다. ('/analyze')")
+
+    # ② 오늘의 마케팅 큐 — 편수 목표가 아니라 '오늘 내보낼 값어치가 있는 것'만 담는다
+    if not os.path.exists(os.path.join(QUEUE_DIR, today + ".md")):
+        out.append("오늘 큐가 아직 없습니다 — 게시 가치가 있는 것부터 뽑습니다(편수 목표 아님). ('/today')")
+
+    # ③ 유효기간 임박·경과 — 속도형 신호는 지나면 가치가 0이 아니라 마이너스(늦은 브랜드로 보임)
+    exp = _lib("expiring", 3)
+    if exp:
+        ex = " / ".join(_safe(r.get("label")) for r in exp[:2])
+        out.append(f"유효기간 임박·경과 신호·기회 {len(exp)}건 — 오늘 쓰거나 상태를 내립니다. "
+                   f"(예: {ex}) ('/signals', '/opportunity')")
+
+    # ④ 미회신 핸드오프 — 회신 없는 계약은 계약 위반(PLAN §8)
+    ho = _unreplied_handoffs()
+    if ho:
+        out.append(f"미회신 핸드오프 {len(ho)}건 — 회신 없는 계약은 위반입니다. 접수 판정(수락/조정)부터 "
+                   f"냅니다. (예: {_safe(ho[0])}) ('/handoff')")
+
+    # ⑤ 소재 피로도 — 성과 하락 근거 없이 '피로도'만으로 리프레시 발주를 밀지 않는다(PLAN §5 cmd_fatigue)
+    fat = _lib("fatigue")
+    if fat:
+        out.append(f"소재 피로도 임박·경과 {len(fat)}건 — 성과 하락이 함께 확인되면 리프레시 발주를 "
+                   f"제안합니다(발주는 승인 게이트). ('/imagefactory')")
+
+    return out[:4]
+
+
+def main():
+    cfg = load_config(soft=True)
+
+    # 첫 설치(설정 전) → 선제 온보딩: 클로드가 먼저 설정을 제안하게 한다
+    if not cfg:
+        emit_context(
+            "SessionStart",
+            "📣 [AI 마케팅 운영자] 아직 설정 전입니다. 방금 설치했다면 먼저 짧게 인사하고 "
+            "'3분 설정 끝내고 오늘 큐부터 돌릴까요?'라고 물어보세요. 원하면 'AI 마케팅 운영자 설정 "
+            "시작하자'로 역할·브랜드·상품과 **마진율**·목표 1개·채널·승인 모드까지 [[setup]] 스킬이 "
+            "7문항으로 안내합니다(마진이 없으면 손익 계산 기능이 제한된다고 반드시 알릴 것). "
+            "원치 않으면 존중하세요.",
+        )
+        return
+
+    if cfg.get("proactive", {}).get("enabled", True) is False:
+        return
+
+    items = _nudges(cfg)
+    if not items:
+        return
+
+    lines = ["📣 [AI 마케팅 운영자] 출근했습니다 — 오늘 돌릴 루프부터 숫자로 보고합니다 "
+             "(게시·발주·집행은 승인 게이트)"]
+    lines += [f"  · {it}" for it in items]
+    emit_context("SessionStart", "\n".join(lines))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception:
+        pass  # 훅은 어떤 경우에도 세션을 방해하지 않는다
+    sys.exit(0)

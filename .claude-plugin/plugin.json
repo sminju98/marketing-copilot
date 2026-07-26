@@ -1,0 +1,63 @@
+{
+  "name": "marketing-copilot",
+  "version": "1.0.0",
+  "description": "트렌드와 고객 반응에서 돈 될 기회를 찾아 콘텐츠·바이럴·광고로 실행하고, 성과를 다시 다음 행동으로 바꾸는 행동형 AI 마케팅 운영자. 스킬 26종: 역할·권한 온보딩(승인 모드 5종)·트렌드/키워드/밈 신호 감지·돈 될 기회 선제발굴(손익분기 ROAS·허용 CAC·최소 테스트 예산·중단조건)·오늘의 마케팅 큐·인스타/틱톡/블로그 콘텐츠·커뮤니티 댓글 큐(3모드)·콘텐츠 재활용·제작 브리프·광고 캠페인 설계와 집행 연동·성과 분석과 검증된 메시지 원장·4형제 핸드오프. 🚦게시 게이트가 인프라: 클레임 실증·표시의무(뒷광고 방지)·브랜드·플랫폼 정책·퀄리티 바를 게시 전 자동 검사 — 저품질 대량 게시(양치기)는 계정 도달률을 깎으므로 편수 목표를 두지 않는다. 📊측정 없는 게시 금지 — 커넥터가 없으면 수동 성과 기록으로라도 남긴다. 🔌GA4·광고계정·SNS 미연결이어도 로컬 최소 마케팅 DB로 동작.",
+  "author": {
+    "name": "songminju",
+    "email": "sminju98@gmail.com"
+  },
+  "homepage": "https://github.com/sminju98/marketing-copilot",
+  "repository": "https://github.com/sminju98/marketing-copilot",
+  "license": "MIT",
+  "keywords": [
+    "marketing",
+    "마케팅",
+    "content-marketing",
+    "콘텐츠",
+    "seo",
+    "social-media",
+    "instagram",
+    "tiktok",
+    "blog",
+    "community",
+    "바이럴",
+    "ads",
+    "광고",
+    "performance-marketing",
+    "ga4",
+    "roas",
+    "campaign",
+    "trend"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "userConfig": {
+    "me_name": {
+      "type": "string",
+      "title": "내 이름/호칭",
+      "description": "브리핑·산출물에 쓸 이름 (예: 송민주). 나중에 '설정'에서 바꿀 수 있어요."
+    },
+    "brand_name": {
+      "type": "string",
+      "title": "브랜드/제품 이름",
+      "description": "마케팅의 기준이 되는 브랜드·제품 이름 (예: 이미지팩토리)."
+    },
+    "slack_private_webhook": {
+      "type": "string",
+      "title": "나만 보기 슬랙 Webhook URL",
+      "description": "오늘의 마케팅 큐·기회 제안·성과 경보를 받을 Slack Incoming Webhook (https://hooks.slack.com/...). 안 넣으면 나중에 대화형 '설정'으로 연결.",
+      "sensitive": true
+    },
+    "slack_team_webhook": {
+      "type": "string",
+      "title": "마케팅팀 공유 슬랙 Webhook URL (선택)",
+      "description": "팀 공유용 브리핑을 보낼 Slack Incoming Webhook. 개인용과 반드시 다른 채널로 — 마진·예산 상한·미공개 캠페인은 여기로 안 나갑니다.",
+      "sensitive": true
+    },
+    "proactive_enabled": {
+      "type": "boolean",
+      "title": "세션 시작 시 먼저 챙기기",
+      "description": "새 세션마다 오늘의 큐·유효기간 임박 기회·미회신 핸드오프·소재 피로도를 먼저 짚어줄지 (선제 훅). 나중에 끌 수 있어요.",
+      "default": true
+    }
+  }
+}
