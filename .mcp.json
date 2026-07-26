@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "slack": {
+      "type": "http",
+      "url": "https://mcp.slack.com/mcp"
+    },
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "asana": {
+      "type": "http",
+      "url": "https://mcp.asana.com/v2/mcp"
+    },
+    "monday": {
+      "type": "http",
+      "url": "https://mcp.monday.com/mcp"
+    },
+    "clickup": {
+      "type": "http",
+      "url": "https://mcp.clickup.com/mcp"
+    },
+    "linear": {
+      "type": "http",
+      "url": "https://mcp.linear.app/mcp"
+    },
+    "google drive": {
+      "type": "http",
+      "url": ""
+    },
+    "gmail": {
+      "type": "http",
+      "url": ""
+    },
+    "google calendar": {
+      "type": "http",
+      "url": ""
+    },
+    "microsoft 365": {
+      "type": "http",
+      "url": ""
+    }
+  }
+}

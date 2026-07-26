@@ -30,6 +30,9 @@
     "trend"
   ],
   "hooks": "./hooks/hooks.json",
+  "skills": "./skills",
+  "commands": "./commands",
+  "mcpServers": "./.mcp.json",
   "userConfig": {
     "me_name": {
       "type": "string",

@@ -21,6 +21,9 @@
       "license": "MIT",
       "category": "marketing",
       "hooks": "./hooks/hooks.json",
+      "skills": "./skills",
+      "commands": "./commands",
+      "mcpServers": "./.mcp.json",
       "keywords": [
         "marketing",
         "마케팅",
