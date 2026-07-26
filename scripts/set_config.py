@@ -29,15 +29,54 @@ def parse_value(s):
     body = s[1:] if s.startswith("-") else s
     if body.isdigit():
         return int(s)
-    return s
+    # 소수 — 마진율(0.3)·배수(1.5) 같은 값이 문자열로 저장되면 돈 계산이 조용히 깨진다.
+    # "30%" 도 받아 0.3 으로 바꾼다(마진율을 퍼센트로 적는 실수가 잦다).
+    if body.endswith("%"):
+        try:
+            return float(body[:-1]) / 100
+        except ValueError:
+            return s
+    try:
+        return float(s)
+    except ValueError:
+        return s
 
 
 def set_path(cfg, path, value):
+    """점 경로로 값을 넣는다. 숫자 조각은 리스트 인덱스로 취급한다.
+
+    offerings 처럼 배열인 항목이 있어(`offerings.0.margin_rate`) dict 전용으로
+    두면 마진율 등록 — 이 플러그인 돈 계산의 뿌리 — 이 통째로 막힌다."""
     keys = path.split(".")
     node = cfg
-    for k in keys[:-1]:
-        node = node.setdefault(k, {})
-    node[keys[-1]] = value
+    for i, k in enumerate(keys[:-1]):
+        nxt = keys[i + 1]
+        if isinstance(node, list):
+            idx = _as_index(k, node, path)
+            node = node[idx]
+            continue
+        if k not in node or not isinstance(node[k], (dict, list)):
+            # 다음 조각이 숫자면 배열을, 아니면 객체를 만든다.
+            node[k] = [] if nxt.isdigit() else {}
+        node = node[k]
+
+    last = keys[-1]
+    if isinstance(node, list):
+        node[_as_index(last, node, path)] = value
+    else:
+        node[last] = value
+
+
+def _as_index(k, seq, path):
+    if not k.isdigit():
+        raise SystemExit(f"[에러] '{path}' — '{k}' 위치는 배열이라 숫자 인덱스가 필요합니다(0부터). 아무것도 저장하지 않았습니다.")
+    idx = int(k)
+    if idx >= len(seq):
+        raise SystemExit(
+            f"[에러] '{path}' — 인덱스 {idx} 가 범위를 벗어났습니다(현재 {len(seq)}개). "
+            "아무것도 저장하지 않았습니다."
+        )
+    return idx
 
 
 def _redact(path, value):
