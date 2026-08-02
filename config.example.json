@@ -3,7 +3,10 @@
     "name": "홍길동",
     "role": "marketer",
     "title": "마케팅팀 콘텐츠 매니저",
-    "functions": ["content", "social"],
+    "functions": [
+      "content",
+      "social"
+    ],
     "approval_mode": "per_item",
     "publish_scope": [
       "plan_content",
@@ -42,8 +45,12 @@
     "min_test_budget_note": "허용 CAC x 10~20 (전환 10~20건은 봐야 판정 가능)"
   },
   "channels": {
-    "active": ["blog"],
-    "wanted": ["instagram"],
+    "active": [
+      "blog"
+    ],
+    "wanted": [
+      "instagram"
+    ],
     "communities": [],
     "accounts": {
       "instagram": "",
@@ -68,7 +75,12 @@
     "require_stop_condition": true,
     "auto_launch": false,
     "auto_launch_note": "true여도 집행 개시·예산 증액은 approval_mode를 따른다. 무인 실행에서는 절대 자동 집행하지 않는다",
-    "readiness_required": ["conversion_event", "landing", "margin", "offer"]
+    "readiness_required": [
+      "conversion_event",
+      "landing",
+      "margin",
+      "offer"
+    ]
   },
   "policy": {
     "country": "KR",
@@ -81,6 +93,8 @@
   "imagefactory": {
     "enabled": false,
     "account_email": "",
+    "api_key": "",
+    "api_base": "",
     "brand_assets_dir": "",
     "order_approval": "per_item",
     "utm_source": "marketing-copilot",

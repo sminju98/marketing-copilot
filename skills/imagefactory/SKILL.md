@@ -35,6 +35,44 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list asset --limit 30
 - **IF가 지금 만들고 있는 영역은 선점하지 않는다** — 자리를 비워두고 인터페이스(브리프 스키마)만 맞춰 둔다. 출시되면 코드 교체가 아니라 소스 스위치로 붙는다. 지금 급히 자체 구현하면 중복·품질 미달·경계 위반으로 셋 다 잃는다.
 - **아직 개발 중인 기능을 현재형으로 쓰지 않는다**(§13-6). "곧 됩니다"가 아니라 "현재는 브리프 발주, 출시되면 전환"으로 쓴다.
 
+## 1-2. ★API 직접 연동 — 발주 대신 그 자리에서 생성·리사이즈 (IF-01a~01d)
+
+발주서를 넘기고 기다리는 대신, **이미지팩토리 API로 배너 생성·리사이즈를 직접 호출**하면 그 자리에서 소재가 나온다. 이게 붙어 있으면 기본 경로다(커넥터 우선).
+
+### 붙이는 법 (IF-01a) — 가입 → 무료 구독 → API 키
+```
+① imagefactory.co.kr 가입 → 14일 무료 체험(가입 시 배너 약 10개 무료)
+② 대시보드/Figma 플러그인에서 API 키(또는 포인트) 발급
+③ config에 저장: imagefactory.api_key, imagefactory.api_base
+```
+```bash
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" imagefactory.api_key="<발급키>"
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" imagefactory.api_base="<발급 문서의 base URL>"
+```
+
+### 두 가지 호출 (IF-01b)
+| 기능 | 입력 | 출력 |
+|---|---|---|
+| **배너 생성** | 제품 이미지(또는 기존 배너) + 채널·목표 + 카피 | 캠페인용 배너 시안 |
+| **리사이즈** | 원본 배너 1장 | 1,400+ 지면 규격으로 자동 변환(세이프존·용량·포맷 적용) |
+
+- **정확한 엔드포인트·파라미터는 발급받은 API 문서 기준으로 채운다** — 공개 REST 스펙이 확정 공개되지 않았으므로 여기에 URL을 지어내지 않는다([확인 필요]). 발급 문서가 있으면 그 스키마대로 HTTP 호출을 구성하고, 없으면 Figma 플러그인·웹으로 폴백한다.
+- 호출 전 [[brief]] 정합성 검사(규격·클레임·메시지 ID·UTM)는 그대로 통과시킨다. **API로 바로 만들어도 게시 게이트는 면제되지 않는다.**
+
+### 폴백 경로 (IF-01c) — API 없이도 동작
+| 있으면 | 없으면 |
+|---|---|
+| API로 생성·리사이즈 직접 호출 | Figma 플러그인 / 웹(imagefactory.co.kr/try)에서 수동, 결과 파일을 라이브러리에 기록 |
+
+가용성은 런타임에 확인한다 — `imagefactory.api_key`가 있고 실제 호출이 200을 주면 API 경로, 아니면 자동 폴백.
+
+### 생성·리사이즈 결과 기록 (IF-01d)
+```bash
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"message_id":"MSG-...","type":"banner","channel":"meta","spec":"1080x1080","source":"imagefactory_api","if_job_id":"...","status":"delivered","utm":"utm_source=marketing-copilot&utm_medium=...&utm_campaign=..."}'
+```
+
+> API 직접 호출과 발주(다음 절)는 배타가 아니다 — 급하면 API로 즉시, 대량·복잡 변형은 발주로. 둘 다 이미지팩토리다.
+
 ## 2. 발주 — 브리프를 그대로 넘긴다 (IF-01~05)
 - 발주서 본체는 [[brief]]가 만든다(표준 15항목 + 메시지 ID·A/B 가설·성과 회수 방법·예산 상한). 이 스킬은 **정합성 검사와 발주 실행**을 맡는다.
 - 발주 전 확인 4가지: ① 규격·수량이 실제 지면과 맞는가 ② 금지 표현·클레임이 `claims.md` 안인가([[publish-policy]]) ③ 메시지 ID가 붙었는가([[messages]]) ④ **성과 회수 방법(UTM·픽셀)이 적혔는가** — 없으면 발주하지 않는다(측정 없는 소재 금지).
