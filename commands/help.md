@@ -1,5 +1,5 @@
 ---
-description: Marketing Copilot 사용법 — 스킬 40종·상황별 진입점 전체 안내
+description: Marketing Copilot 사용법 — 스킬 41종·상황별 진입점 전체 안내
 argument-hint: [선택: 알고 싶은 것]
 ---
 

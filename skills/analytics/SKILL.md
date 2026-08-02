@@ -113,7 +113,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
 ### ⑥ 주간 자동 회수 (ANL-13~14)
 숫자를 보러 들어가는 습관은 유지되지 않는다 — **숫자가 오게 만든다.**
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","note":"주간 회수","metrics":{"clicks":0,"impressions":0,"conversions":0}}'
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","note":"주간 회수","metrics":{"clicks":0,"impressions":0,"conversions":0}}'
 ```
 - GSC API(요청당 25,000행)로 쿼리·클릭·노출을, GA4 Data API로 유입·전환을 주간 회수해 로컬 성과 기록으로 쌓고, 요약을 주간 판정([[weekly-review]])에 먹인다.
 - [[routine]]으로 주간 등록한다. 회수가 두 번 연속 실패하면 조용히 넘어가지 않고 경보를 남긴다 — 안 오는 숫자는 없는 숫자다.

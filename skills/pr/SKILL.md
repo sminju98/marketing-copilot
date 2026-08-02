@@ -217,7 +217,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # cha
 ## 5. 발송과 승인 (PR-14)
 
 - **[P] 유료 배포·유가기사 구매는 승인 대상**이다 — 대외 지출이므로 config `approval_mode`를 따른다
-- 무료 트랙 발송도 **사람이 직접** 보낸다 (메일 발송 자동화는 하지 않는다)
+- 무료 트랙 발송은 [P] 승인 후 발송(approval_mode 적용) — 대량 발송은 광고성·스팸법 이슈라 승인 게이트를 둔다
 - 발송 전 최종 확인:
 ```
 □ [확인 필요] 표시를 전부 채웠나

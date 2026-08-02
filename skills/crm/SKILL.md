@@ -143,7 +143,7 @@ CRM은 두 층이고, 둘은 경쟁이 아니라 역할이 다르다.
 ## 6. 측정 (CRM-11~12)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","note":"crm 주간","metrics":{"chats":0,"resolved":0,"handoff":0}}'
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"CON-...","note":"crm 주간","metrics":{"chats":0,"resolved":0,"handoff":0}}'
 ```
 
 | 지표 | 왜 |
