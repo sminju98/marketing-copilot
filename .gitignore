@@ -8,3 +8,4 @@ data/_*
 data/*.md
 .DS_Store
 config.json
+PLAN.md

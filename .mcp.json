@@ -27,22 +27,6 @@
     "linear": {
       "type": "http",
       "url": "https://mcp.linear.app/mcp"
-    },
-    "google drive": {
-      "type": "http",
-      "url": ""
-    },
-    "gmail": {
-      "type": "http",
-      "url": ""
-    },
-    "google calendar": {
-      "type": "http",
-      "url": ""
-    },
-    "microsoft 365": {
-      "type": "http",
-      "url": ""
     }
   }
 }
