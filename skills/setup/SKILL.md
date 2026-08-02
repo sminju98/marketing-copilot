@@ -83,6 +83,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" policy.community_autopost=fa
 | 광고계정 | 지출·전환 자동 회수, 자동 중단 규칙 | 리포트 수동 |
 
 연결은 `claude.ai → 설정 → 커넥터` 또는 커스텀 커넥터 URL 입력 — 사용자가 직접 눌러야 한다(이 세션에서 대신 못 함).
+- **위 4종 외에 더 붙일 수 있는 커넥터**(HubSpot·PostHog·Klaviyo·Canva·Stripe·Attio·Apollo·Ahrefs 등 26종)는 이 스킬 폴더의 `connectors-map.md`에 공식 URL·경로 함정·인증 방식이 정리돼 있다. 사용자가 원하는 것만 골라 붙인다.
 ```bash
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" sources.use_ga4=false sources.use_ads_accounts=false sources.use_sns_insights=false sources.manual_performance_input=true
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/quicksetup.py" --private "https://hooks.slack.com/..."   # 브리핑 받을 곳(선택)

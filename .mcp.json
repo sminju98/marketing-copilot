@@ -8,25 +8,25 @@
       "type": "http",
       "url": "https://mcp.notion.com/mcp"
     },
-    "figma": {
+    "hubspot": {
       "type": "http",
-      "url": "https://mcp.figma.com/mcp"
+      "url": "https://mcp.hubspot.com"
     },
-    "asana": {
+    "posthog": {
       "type": "http",
-      "url": "https://mcp.asana.com/v2/mcp"
+      "url": "https://mcp.posthog.com/mcp"
     },
-    "monday": {
+    "klaviyo": {
       "type": "http",
-      "url": "https://mcp.monday.com/mcp"
+      "url": "https://mcp.klaviyo.com/mcp"
     },
-    "clickup": {
+    "canva": {
       "type": "http",
-      "url": "https://mcp.clickup.com/mcp"
+      "url": "https://mcp.canva.com/mcp"
     },
-    "linear": {
+    "stripe": {
       "type": "http",
-      "url": "https://mcp.linear.app/mcp"
+      "url": "https://mcp.stripe.com"
     }
   }
 }

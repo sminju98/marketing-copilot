@@ -145,5 +145,11 @@
   },
   "setup": {
     "completed": false
+  },
+  "design": {
+    "gemini_api_key": "",
+    "openai_api_key": "",
+    "photoroom_api_key": "",
+    "image_model": "gemini-3.1-flash-image"
   }
 }
