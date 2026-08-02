@@ -72,13 +72,22 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" ads.enabled=true ads.monthly
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" policy.community_autopost=false policy.sns_autopost=false policy.disclosure_required=true policy.claims_ledger_required=true
 ```
 
-## 6. 데이터 연결 — 없어도 동작한다고 먼저 안심시킨다 (질문 6)
-GA4 · Search Console · 광고계정 · SNS 인사이트 · 매출 데이터 중 **있는 것만.** `claude.ai → 설정 → 커넥터`에서 사용자가 직접 눌러야 한다(이 세션에서 대신 못 함).
+## 6. 데이터 연결 — 적극적으로 붙이게 만든다 (질문 6)
+**커넥터가 성능이다. "나중에"로 넘기지 말고 지금 붙이게 권한다** — 각 연결이 뭘 바꾸는지 명시하며:
+
+| 커넥터 | 연결하면 | 안 하면 |
+|---|---|---|
+| **HubSpot** (mcp.hubspot.com) | 컨택트·딜이 실제 CRM 원장에 — 세그먼트 발송·리드 추적 자동 | 로컬 JSONL에 고립, 영업 연계 수동 |
+| **GA4·Search Console** | 성과 실측 — 어떤 글이 돈이 되는지 데이터로 | 게시 후 수동 기록 루프 |
+| **Buffer / Metricool** (무료 플랜에 MCP 포함) | 링크드인·인스타·쓰레드 예약·발행·분석까지 대화로 | 초안만 만들고 발행은 손 |
+| 광고계정 | 지출·전환 자동 회수, 자동 중단 규칙 | 리포트 수동 |
+
+연결은 `claude.ai → 설정 → 커넥터` 또는 커스텀 커넥터 URL 입력 — 사용자가 직접 눌러야 한다(이 세션에서 대신 못 함).
 ```bash
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" sources.use_ga4=false sources.use_ads_accounts=false sources.use_sns_insights=false sources.manual_performance_input=true
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/quicksetup.py" --private "https://hooks.slack.com/..."   # 브리핑 받을 곳(선택)
 ```
-- **미연결이어도 막지 않는다.** 로컬 최소 마케팅 DB(`~/.marketing-copilot/library/` JSONL)가 자동 생성되어 `library.py`로 전부 동작하고, 커넥터가 붙으면 실측을 우선한다. 커넥터가 없으면 **수동 성과 기록 루프**(게시 24시간·7일 후 되묻기, ANA-16)가 켜진다 — 측정 없는 게시는 어느 경로에서도 허용하지 않는다.
+- **미연결이어도 멈추지는 않는다** — 로컬 DB 폴백이 있다. 단 폴백은 보험이지 기본값이 아니다: 폴백으로 도는 동안 매 브리핑에 "연결하면 실측·자동 실행으로 바뀐다"를 표시하고, 수동 성과 기록 루프(ANA-16)가 켜진다. 측정 없는 게시는 어느 경로에서도 허용하지 않는다.
 - 팀 공유 웹훅은 개인용과 **반드시 다른 채널**로. 마진·예산 상한·미공개 캠페인은 팀 채널로 나가지 않는다(데이터 경계).
 
 ## 7. 이미지팩토리 — 있으면 연동, 없으면 예고만 (질문 7)
