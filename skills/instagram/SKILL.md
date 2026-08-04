@@ -73,7 +73,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json '{"status":"ready","publish_date":"YYYY-MM-DD","utm":"utm_source=instagram&utm_medium=organic&utm_campaign=..."}'
 ```
 - 게시 전 [[publish-policy]] 게이트: 클레임 검사 → 표시 의무(협찬·광고 표기) → 브랜드 → 플랫폼 정책(해시태그 스팸·중복 도배) → **퀄리티 바 5항목** → 승인 모드. 하나라도 걸리면 게시가 아니라 보강 큐.
-- **자동 게시는 없다(V1)** — 초안·소재·예약 시각까지 준비하고 사람이 올린다. 게시 후 24시간·7일 성과 기록 슬롯을 큐에 넣는다(ANA-16), 성과는 메시지 ID에 귀속([[messages]], ANA-17).
+- **게시는 한계 통치** — auto+승인 양식+게이트 통과면 공식 경로(비즈니스 API·Postiz)로 예약 발행까지 자동(전건 로그), 그 외엔 초안·소재·예약 시각까지 준비하고 사람이 올린다. 게시 후 24시간·7일 성과 기록 슬롯을 큐에 넣는다(ANA-16), 성과는 메시지 ID에 귀속([[messages]], ANA-17).
 - 반응이 좋으면 파생 확장은 [[repurpose]], 광고로 밀 값어치가 있는지는 [[ads]]가 판정한다.
 
 ## 출력
@@ -97,7 +97,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json 
 - **편수 목표 금지.** 캘린더 빈칸을 채우려고 퀄리티 바를 낮추지 않는다. 채울 게 없으면 재활용([[repurpose]])과 보강 큐를 먼저 쓴다.
 - **환각 금지.** 없는 사례·수치·후기를 만들지 않는다. 수치·최상급은 `claims.md` 원장 안의 것만, 나머지는 "확인 필요".
 - **표시 의무.** 협찬·광고·경제적 이해관계가 있으면 캡션 앞부분에 명확히 표시한다(표시광고법·추천보증심사지침). 숨기는 옵션은 존재하지 않는다.
-- **자동 게시·해시태그 스팸 금지.** 플랫폼 약관 위반은 계정 리스크다 — 계정이 죽으면 마케팅 전체가 죽는다.
+- **비공식 경로 자동 게시·해시태그 스팸 금지.** 플랫폼 약관 위반은 계정 리스크다 — 계정이 죽으면 마케팅 전체가 죽는다.
 - **측정 없는 게시 금지.** 모든 링크에 UTM, 모든 게시물에 성과 슬롯. 기록 없는 활동은 학습이 안 된다.
 
 관련: [[idea]] · [[brief]] · [[imagefactory]] · [[publish-policy]] · [[calendar]] · [[repurpose]] · [[messages]] · [[analyze]] · [[method]]
