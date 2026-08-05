@@ -64,13 +64,24 @@ def show(d=None, channel=None, industry=None):
 
     print(f"📐 기준선 — 공개 자료 인용 {len(rows)}행 · 출처 {len(d.get('sources', []))}곳")
     print("   ⚠️ 이 도구 사용자의 실측이 아니라 **공개된 리서치 수치**입니다.\n")
-    print(f"  {'채널':10}{'업종':18}{'지표':7}{'값':>8}  {'종류':6}{'시장':5}{'신뢰':5} 출처")
-    print("  " + "─" * 84)
-    for r in sorted(rows, key=lambda x: (x.get("channel", ""), x.get("industry", ""))):
-        s = _src(d, r.get("source"))
-        print(f"  {r.get('channel',''):10}{r.get('industry',''):18}{r.get('metric',''):7}"
-              f"{r.get('value',''):>8}  {r.get('kind',''):6}{r.get('market',''):5}"
-              f"{r.get('confidence',''):5} {s.get('name','')[:26]} ({s.get('published','')})")
+    def w(t, n):
+        """한글은 폭이 2다. 그걸 안 세면 표가 어긋난다."""
+        t = str(t)
+        cur = sum(2 if ord(c) > 0x1100 else 1 for c in t)
+        while cur > n:
+            t = t[:-1]
+            cur = sum(2 if ord(c) > 0x1100 else 1 for c in t)
+        return t + " " * (n - cur)
+
+    print(f"  {w('채널',13)}{w('업종',24)}{w('지표',6)}{w('값',9)}{w('종류',9)}"
+          f"{w('시장',13)}{w('신뢰',5)}출처")
+    print("  " + "─" * 96)
+    for r in sorted(rows, key=lambda x: (x.get("channel", ""), x.get("industry", ""), x.get("metric", ""))):
+        src = _src(d, r.get("source"))
+        val = f"{r.get('value','')}{r.get('unit','')}"
+        print(f"  {w(r.get('channel',''),13)}{w(r.get('industry',''),24)}{w(r.get('metric',''),6)}"
+              f"{w(val,9)}{w(r.get('kind',''),9)}{w(r.get('market',''),13)}"
+              f"{w(r.get('confidence',''),5)}{src.get('name','')[:24]}")
 
     for c in d.get("caveats", []):
         print(f"\n  ⚠️ {c}")
