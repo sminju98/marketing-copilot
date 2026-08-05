@@ -151,5 +151,17 @@
     "openai_api_key": "",
     "photoroom_api_key": "",
     "image_model": "gemini-3.1-flash-image"
+  },
+  "gates": {
+    "_note": "하드 게이트 — 코드가 세는 한도. 비워두면 fail-closed(=차단)다. scripts/gates.py 가 읽는다.",
+    "daily_send_cap": 0,
+    "_daily_send_cap_note": "채널별 하루 발송 상한(건). 0/미설정이면 모든 자동 발송 차단.",
+    "quiet_hours": {
+      "start": 21,
+      "end": 8
+    },
+    "_quiet_hours_note": "광고성 발송 금지 시간대(시). 정보통신망법 야간 제한 대비.",
+    "daily_budget_cap": 0,
+    "_daily_budget_cap_note": "캠페인별 하루 집행 상한(원). 0/미설정이면 자동 집행 차단."
   }
 }

@@ -19,6 +19,19 @@ cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/tone.md" 2>/dev/null
 ```
 - config `policy`(disclosure_required·community_autopost·sns_autopost·claims_ledger_required)와 `me.approval_mode`·`publish_scope`를 로드. **`claims.md`가 없으면 수치·효능 주장이 들어간 콘텐츠는 전부 반려**가 기본값이다 → [[context]].
 
+### 0-1. ★하드 게이트 — 판단이 아니라 코드가 센다 (자동 게시 전 필수)
+게이트 1~6은 모델이 읽고 판정하는 검사다. **양식 동일성·발송량·시간대·예산 상한은 모델의 판단에 맡기지 않고 `gates.py`가 파일 상태로 센다.** exit code 2면 그 자리에서 중단하고 승인 큐로 올린다 — 우회 금지.
+```bash
+G="$CLAUDE_PLUGIN_ROOT/scripts/gates.py"
+python3 "$G" status                                              # 한도 설정 확인
+python3 "$G" template check --id <양식ID> --file <원고파일>        # 승인본과 해시 대조
+```
+- **양식 판정은 해시로 한다.** 등록된 승인본과 본문 해시가 다르면 그건 "새 양식"이고 자동 게시 대상이 아니다. 모델이 "비슷하니 같은 양식"이라고 판단하는 경로를 없앤다.
+- 새 양식을 승인했으면 사람이 등록한다: `python3 "$G" template register --id <양식ID> --file <원고파일> --scope <채널>`
+- **한도가 config에 없으면 차단이 기본값이다**(fail-closed). "모르면 멈춘다" — 상태를 확인 못 한 채 나가는 것이 사고의 대부분이다.
+- 이 스크립트는 한도를 **올리지 못한다.** 상향은 사람이 `config.json`의 `gates.*`를 직접 고쳐야 한다.
+- 처음 켤 때 한 번은 **네거티브 테스트**로 실제 차단을 확인한다(통과를 확인해서는 게이트가 검증되지 않는다): `python3 "$G" selftest`
+
 ## 1. 게이트 1 — 클레임 실증 검사 (§6-J-1, CTX-07)
 콘텐츠의 모든 **수치·효능·비교·최상급 주장**을 뽑아 `claims.md` 원장과 대조한다.
 - ✅ **원장에 있음(실증 등급)** → 통과. 원장에 적힌 **표현 한계**(기간·모수·"내부 측정 기준" 병기 등)를 그대로 붙인다.
