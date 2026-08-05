@@ -18,7 +18,7 @@ description: 측정 셋팅(장부) — 사이트에 지금 뭐가 깔려 있는�
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
+marketing-copilot library list content --limit 20
 ```
 - 사이트 주소·플랫폼(자체 코드/워드프레스/카페24/아임웹/스마트스토어 등)·코드 레포 접근 가능 여부를 확인한다. 레포가 있으면 직접 심고, 없으면 붙여넣을 코드와 정확한 삽입 위치를 준다.
 - "돈에 가장 가까운 행동"을 먼저 정한다 — 구매완료·문의 제출·전화 클릭·가입 중 하나. 전환 이벤트는 여기서 1개로 시작한다.
@@ -116,7 +116,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
 - **완료 기준**(이 스킬 DNA): “설치했다”가 아니라 ★테스트 전환이 브라우저·서버 양쪽으로 찍히고 dedup 후 1건으로 보이는 걸 눈으로 본 것.
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"measurement","note":"채널 계측 상태","metrics":{"channel_meta_pixel":1,"channel_meta_capi":1,"dedup_verified":1}}'
+marketing-copilot library add performance --json '{"target_kind":"measurement","note":"채널 계측 상태","metrics":{"channel_meta_pixel":1,"channel_meta_capi":1,"dedup_verified":1}}'
 ```
 `dedup_verified=false`면 [[ads]]가 “판정 장부 미완”으로 집행을 보류한다.
 
@@ -138,7 +138,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"targe
 ### ⑥ 주간 자동 회수 (ANL-13~14)
 숫자를 보러 들어가는 습관은 유지되지 않는다 — **숫자가 오게 만든다.**
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","note":"주간 회수","metrics":{"clicks":0,"impressions":0,"conversions":0}}'
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","note":"주간 회수","metrics":{"clicks":0,"impressions":0,"conversions":0}}'
 ```
 - GSC API(요청당 25,000행)로 쿼리·클릭·노출을, GA4 Data API로 유입·전환을 주간 회수해 로컬 성과 기록으로 쌓고, 요약을 주간 판정([[weekly-review]])에 먹인다.
 - [[routine]]으로 주간 등록한다. 회수가 두 번 연속 실패하면 조용히 넘어가지 않고 경보를 남긴다 — 안 오는 숫자는 없는 숫자다.

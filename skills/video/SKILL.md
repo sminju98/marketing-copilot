@@ -16,8 +16,8 @@ description: AI 제품 영상 — 제품 스크린샷·화면녹화를 알차게
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
+marketing-copilot library list message --limit 10
+marketing-copilot library list content --limit 20
 ```
 - 어떤 메시지로 만들지 원장([[messages]])에서 먼저 고른다. 영상은 제작비가 가장 비싼 포맷이라 **검증 안 된 각도로 만들면 손실이 제일 크다.**
 
@@ -129,7 +129,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
 ## 8. 측정 (VID-11~12)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"video","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"video","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 
 | 지표 | 신호 |

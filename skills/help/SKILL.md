@@ -13,9 +13,9 @@ Marketing Copilot은 마케팅 전략서를 써주는 도구가 아니라 **오�
 
 ## 0. 준비 — 지금 상태를 보고 안내를 맞춘다
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
+marketing-copilot doctor
+marketing-copilot library stats
+marketing-copilot library unmeasured
 ```
 - 설정이 비어 있으면 **[[setup]]부터** 권한다. 데이터가 있으면 "성과 미기록 {N}건" 같은 **실측 숫자로** 진입점을 찍는다. 없는 숫자는 지어내지 않는다.
 

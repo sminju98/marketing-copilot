@@ -23,8 +23,8 @@ description: 마케팅 코파일럿 첫 설정 — 7문항 온보딩(역할·브
 
 ## 0. 준비 — 상태 진단 (빠른 길 먼저)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"        # config·context 10종·library·게시정책 점검
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/quicksetup.py"    # ⚡ 웹훅 1줄 셋업 + config 골격 준비
+marketing-copilot doctor        # config·context 10종·library·게시정책 점검
+marketing-copilot quicksetup    # ⚡ 웹훅 1줄 셋업 + config 골격 준비
 ```
 - **사용자는 파일·JSON·터미널을 직접 건드리지 않는다.** 아래 질문을 한 번에 하나씩 쉬운 말로 묻고, 받은 값을 `set_config.py`로 네가 대신 저장한다. 어려운 항목은 "지금은 건너뛰기"를 제안 — 건너뛴 값은 안전한 기본(건별 승인·초안까지·광고 비활성)이다.
 - 이미 `setup.completed=true`면 처음부터 다시 묻지 말고 **바꿀 항목만** 묻는다("승인 모드만 바꿔줘", "광고 상한 올려줘").
@@ -32,15 +32,15 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/quicksetup.py"    # ⚡ 웹훅 1줄 셋업 
 ## 1. 누구인가 — 역할·직급·담당 업무 (질문 1)
 역할(role): 대표·공동창업자 `founder` / C-Level·CMO `exec` / 마케팅총괄·팀장 `mkt_lead` / 마케팅 팀원·실무자 `marketer` / 타부서 `other_dept` / 개인사업자·쇼핑몰·크리에이터 `solo` / 대행사 `agency`. 직급·직책과 실제 담당 업무는 그대로 받아 적는다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" me.name="홍길동" me.role="marketer" me.title="마케팅팀 콘텐츠 매니저" me.functions="content,social"
+marketing-copilot set_config me.name="홍길동" me.role="marketer" me.title="마케팅팀 콘텐츠 매니저" me.functions="content,social"
 ```
 - 역할별 동작 차이(대표=기회·예산 중심, 팀장=포트폴리오·승인, 팀원=오늘의 큐, 타부서=제보만, 개인사업자=간소화, 대행사=고객사 분리)는 [[role]]이 정한다. **모르겠다는 답은 낮은 권한으로 가정.**
 
 ## 2. ★브랜드·상품 — 객단가와 마진율 (질문 2, 최우선)
 뭘 파는가, 대표 상품 1~3개, **객단가와 대략의 마진율**. 마진율은 "원가 빼고 대략 몇 % 남나요"로 쉽게 묻는다(0~1로 저장 — 30%면 0.3).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brand.name="우리 브랜드" brand.one_liner="무엇을, 누구에게, 왜 좋은지 한 줄" economics.aov=50000 economics.margin_rate=0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3   # 바로 보여준다: "ROAS 3.33 이하는 적자입니다"
+marketing-copilot set_config brand.name="우리 브랜드" brand.one_liner="무엇을, 누구에게, 왜 좋은지 한 줄" economics.aov=50000 economics.margin_rate=0.3
+marketing-copilot econ breakeven --margin 0.3   # 바로 보여준다: "ROAS 3.33 이하는 적자입니다"
 ```
 - `set_config.py`는 점(.) 중첩 **딕셔너리** 경로만 쓴다 — 상품이 여러 개면 대표값만 `economics.*`에 넣고, **상품별 가격·마진·경쟁재는 [[context]]가 `context/products.md`에 기록**한다(config `offerings` 목록은 예시 파일 구조를 그대로 두거나 [[context]]가 채운다).
 - **"나중에"는 허용하되 반드시 결과를 알린다**: "마진 없으면 손익분기 ROAS·허용 CAC·최소 테스트 예산이 계산되지 않아 기회 제안과 광고 판정이 전부 '확인 필요'로 나갑니다." 미입력 상태는 `doctor.py`가 계속 짚고, [[opportunity]]·[[ads]]가 매번 되묻는다.
@@ -49,13 +49,13 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3   # 바로 
 ## 3. 주요 목표 1개 (질문 3 — 여러 개 고르게 하지 않는다)
 `revenue` 매출 / `leads` 리드·상담 / `signup` 가입 / `awareness` 인지도 / `launch` 신제품·프로모션 / `retention` 재구매. **우선순위를 강제하는 게 목적**이라 하나만 받는다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brand.primary_goal="revenue"
+marketing-copilot set_config brand.primary_goal="revenue"
 ```
 
 ## 4. 채널 — 지금 하는 것 / 하고 싶은 것 (질문 4)
 운영 중인 채널과 새로 시작하고 싶은 채널을 **구분해서** 받는다. 커뮤니티는 별도로(이름 목록) — [[comment]]가 쓴다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" channels.active="blog,instagram" channels.wanted="tiktok" channels.accounts.instagram="@brand"
+marketing-copilot set_config channels.active="blog,instagram" channels.wanted="tiktok" channels.accounts.instagram="@brand"
 ```
 - V1 어댑터는 인스타·틱톡·블로그·커뮤니티 댓글이다. 그 외 채널(스레드·X·링크드인·유튜브)은 확장 예정임을 **현재형으로 말하지 않고** 안내한다.
 
@@ -71,15 +71,15 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" channels.active="blog,instag
 | `escalate` **ESCALATE** | 권한을 넘으면 상급자 상신 |
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" me.publish_scope="plan_content,draft_content,draft_comment,create_brief" me.approval_mode="per_item" me.reports_to="김이사"
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" ads.enabled=true ads.monthly_budget_cap=1000000 ads.daily_budget_cap=50000 ads.require_stop_condition=true ads.auto_launch=false
+marketing-copilot set_config me.publish_scope="plan_content,draft_content,draft_comment,create_brief" me.approval_mode="per_item" me.reports_to="김이사"
+marketing-copilot set_config ads.enabled=true ads.monthly_budget_cap=1000000 ads.daily_budget_cap=50000 ads.require_stop_condition=true ads.auto_launch=false
 ```
 - `publish_scope`·`channels.active`는 이 경로로는 쉼표 문자열, `quicksetup.py` 플래그로는 JSON 리스트로 저장된다 — **둘 다 유효**(소비 스킬·훅은 두 형태 모두 처리).
 - **광고비 권한은 별도로 받는다**(§13-6): 월·일 예산 상한, 집행 개시 권한 유무. **`auto`여도 집행 개시·예산 증액은 승인을 거치고, 무인 실행(루틴)에서는 절대 자동 집행하지 않는다.** 중단조건 없는 캠페인은 생성 자체를 거부한다.
 - **미설정·`draft_only`면 어떤 스킬도 게시·발주·집행하지 않는다.** `other_dept`·`agency`·신입에게는 `auto`를 권하지 않는다 — 자세히 [[role]].
 - 게시정책 기본값은 그대로 둔다: 커뮤니티·SNS 자동 게시 금지, 표시 의무 필수, 클레임 원장 필수. 상세는 [[publish-policy]].
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" policy.community_autopost=false policy.sns_autopost=false policy.disclosure_required=true policy.claims_ledger_required=true
+marketing-copilot set_config policy.community_autopost=false policy.sns_autopost=false policy.disclosure_required=true policy.claims_ledger_required=true
 ```
 
 ## 6. 데이터 연결 — 적극적으로 붙이게 만든다 (질문 6)
@@ -95,8 +95,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" policy.community_autopost=fa
 연결은 `claude.ai → 설정 → 커넥터` 또는 커스텀 커넥터 URL 입력 — 사용자가 직접 눌러야 한다(이 세션에서 대신 못 함).
 - **위 4종 외에 더 붙일 수 있는 커넥터**(HubSpot·PostHog·Klaviyo·Canva·Stripe·Attio·Apollo·Ahrefs 등 26종)는 이 스킬 폴더의 `connectors-map.md`에 공식 URL·경로 함정·인증 방식이 정리돼 있다. 사용자가 원하는 것만 골라 붙인다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" sources.use_ga4=false sources.use_ads_accounts=false sources.use_sns_insights=false sources.manual_performance_input=true
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/quicksetup.py" --private "https://hooks.slack.com/..."   # 브리핑 받을 곳(선택)
+marketing-copilot set_config sources.use_ga4=false sources.use_ads_accounts=false sources.use_sns_insights=false sources.manual_performance_input=true
+marketing-copilot quicksetup --private "https://hooks.slack.com/..."   # 브리핑 받을 곳(선택)
 ```
 - **미연결이어도 멈추지는 않는다** — 로컬 DB 폴백이 있다. 단 폴백은 보험이지 기본값이 아니다: 폴백으로 도는 동안 매 브리핑에 "연결하면 실측·자동 실행으로 바뀐다"를 표시하고, 수동 성과 기록 루프(ANA-16)가 켜진다. 측정 없는 게시는 어느 경로에서도 허용하지 않는다.
 - 팀 공유 웹훅은 개인용과 **반드시 다른 채널**로. 마진·예산 상한·미공개 캠페인은 팀 채널로 나가지 않는다(데이터 경계).
@@ -104,7 +104,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/quicksetup.py" --private "https://hooks.sla
 ## 7. 이미지팩토리 — 있으면 연동, 없으면 예고만 (질문 7)
 이미 계정이 있으면 연동(이메일·브랜드 자산 위치·발주 승인 방식). 없으면 **"소재 제작 단계에서 안내"만 예고하고 여기서 가입을 강요하지 않는다** — 억지 추천은 신뢰를 죽인다(§7-4).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" imagefactory.enabled=true imagefactory.account_email="me@company.com" imagefactory.brand_assets_dir="~/브랜드자산" imagefactory.order_approval="per_item"
+marketing-copilot set_config imagefactory.enabled=true imagefactory.account_email="me@company.com" imagefactory.brand_assets_dir="~/브랜드자산" imagefactory.order_approval="per_item"
 ```
 - 발주는 **대외 지출이라 `auto`여도 기본 per_item.** AdOps 집행 연동 가용성은 런타임에 확인하고, 안 열려 있으면 매체별 세팅 가이드로 자동 폴백한다([[imagefactory]]·[[ads]]).
 
@@ -115,8 +115,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" imagefactory.enabled=true im
 ## 9. [A] 루틴 등록 — 묻지 않고 기본으로 건다 (§9)
 설정 저장이 끝나면 **아침 큐 · 주간 판정 · 월간 리뷰 3종을 바로 등록한다.** "등록할까요?"라고 묻지 않는다 — 루틴은 옵션이 아니라 뼈대고, 사용자가 명시적으로 거부할 때만 생략한다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/schedule_brief.py" --kind morning   # weekly·monthly 동일
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.routine_enabled=true
+marketing-copilot schedule_brief --kind morning   # weekly·monthly 동일
+marketing-copilot set_config brief.routine_enabled=true
 ```
 - 스케줄 도구(scheduled-tasks·클라우드 루틴·`/schedule`)가 있으면 그 도구로 즉시 등록하고, 없으면 크론식+프롬프트 레시피를 제시한다. 크론식은 config `brief.morning_schedule`(기본 `0 9 * * 1-5`)·`weekly_schedule`(`0 10 * * 1`)·`monthly_schedule`(`0 10 1 * *`). 등록·수정·해제 본체는 [[routine]].
 - **무인 실행은 한계 통치를 따른다** — auto 모드에서 승인 양식·게이트·한도 안의 발송·게시는 공식 경로로 자동 실행(전건 로그), 한계 밖과 발주·집행 개시·증액은 승인 대기. draft_only가 안전 기본값이며 한계 설정을 마쳐야 auto로 전환한다.
@@ -124,7 +124,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.routine_enabled=true
 ### 9-1. [A] 자동 갱신도 같이 건다 — 지금 안 걸면 아무도 안 건다
 Claude Code는 **공식 마켓플레이스만** 자동 갱신을 기본으로 켠다. 이 플러그인은 서드파티라 **기본이 꺼짐**이다. 그래서 여기서 걸어 두지 않으면 사용자는 몇 달 전 버전을 쓰면서 그 사실조차 모른다 — "이 기능이 왜 없지"의 상당수가 실은 갱신 문제다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/update_check.py" --install-cron
+marketing-copilot update_check --install-cron
 ```
 매주 월요일 09:30 점검·갱신이 걸린다. **사용자가 손댄 파일은 자동으로 지켜진다**(overrides 재적용). 본체는 [[update]].
 
@@ -138,15 +138,15 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/update_check.py" --install-cron
 ### 9-2. [A] 언어 — 묻지 말고 감지한다
 사용자가 쓰는 언어를 그대로 따르면 되므로 **질문을 늘리지 않는다.** 기본값 `auto` 그대로 두고, 사용자가 "영어로 써줘" 같은 요청을 하거나 팀 공용 산출물의 언어를 못 박아야 할 때만 값을 넣는다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" language=auto   # en·ja·zh 등으로 고정 가능
+marketing-copilot set_config language=auto   # en·ja·zh 등으로 고정 가능
 ```
 - **대화 언어와 산출물 언어는 다르다.** 영어로 대화해도 한국 시장에 낼 블로그 글은 한국어로 쓴다. 어느 시장에 낼 것인지가 기준이다.
 - 한국 플랫폼 전용 스킬([[local]]·[[cafe]]·[[jisikin]]·[[alimtalk]])은 다른 시장 사용자에게 권하지 않는다. 자세히 [[method]] 00절.
 
 ## 10. 마무리 — 검증 후 완료 처리
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" setup.completed=true
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
+marketing-copilot set_config setup.completed=true
+marketing-copilot doctor
 ```
 
 ## 출력 (설정 요약 — 마지막에 반드시 보여준다)

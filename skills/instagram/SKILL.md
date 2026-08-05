@@ -14,7 +14,7 @@ description: 인스타그램 어댑터 — 카드뉴스 구조·첫 장 훅·장
 ## 0. 준비 — 정의를 받아온다
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,tone,claims,audiences,channels}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status drafting --limit 5
+marketing-copilot library list content --status drafting --limit 5
 ```
 - [[idea]]의 CON 정의(목표·구매단계·메시지 ID·근거·훅·CTA)가 없으면 먼저 그쪽을 돌린다. **정의 없이 카드부터 짜지 않는다.**
 - 과거에 반응이 좋았던 메시지가 있으면 그 각도를 재사용한다([[messages]]·[[repurpose]]) — 새 메시지보다 검증된 메시지가 우선.
@@ -60,7 +60,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status drafting 
 
 ## 7. 소재 제작 — 발주 (INS-08~09) ★자체 생성하지 않는다
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"BRF-...","type":"carousel","spec":"1080x1350 x10","copy":"장별 문구 첨부","status":"briefed"}'
+marketing-copilot library add asset --json '{"brief_id":"BRF-...","type":"carousel","spec":"1080x1350 x10","copy":"장별 문구 첨부","status":"briefed"}'
 ```
 - **INS-08 소재 브리프**: [[brief]] 표준 포맷(브랜드·상품·목표·타깃·핵심 메시지·오퍼·CTA·채널·규격·수량·사용할 이미지/로고·금지 표현·참고·기한 + 메시지 ID·A/B 가설·성과 회수 방법·예산 상한)으로 작성한다.
 - **INS-09 규격·변형 지시**: 캐러셀 1080×1350, 릴스 커버 1080×1920, 스토리 세이프존 등 지면 규격과 필요 변형 수량을 브리프에 명시 → [[imagefactory]]로 발주. **발주는 대외 지출이므로 기본 per_item 승인.**
@@ -70,7 +70,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"
 
 ## 8. 게시·측정 (INS-10)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json '{"status":"ready","publish_date":"YYYY-MM-DD","utm":"utm_source=instagram&utm_medium=organic&utm_campaign=..."}'
+marketing-copilot library update content <CON-ID> --json '{"status":"ready","publish_date":"YYYY-MM-DD","utm":"utm_source=instagram&utm_medium=organic&utm_campaign=..."}'
 ```
 - 게시 전 [[publish-policy]] 게이트: 클레임 검사 → 표시 의무(협찬·광고 표기) → 브랜드 → 플랫폼 정책(해시태그 스팸·중복 도배) → **퀄리티 바 5항목** → 승인 모드. 하나라도 걸리면 게시가 아니라 보강 큐.
 - **게시는 한계 통치** — auto+승인 양식+게이트 통과면 공식 경로(비즈니스 API·Postiz)로 예약 발행까지 자동(전건 로그), 그 외엔 초안·소재·예약 시각까지 준비하고 사람이 올린다. 게시 후 24시간·7일 성과 기록 슬롯을 큐에 넣는다(ANA-16), 성과는 메시지 ID에 귀속([[messages]], ANA-17).

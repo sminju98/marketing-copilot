@@ -16,8 +16,8 @@ description: 이메일·뉴스레터 — 수집부터 웰컴 시퀀스·정기 �
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=email 레코드를 골라 본다
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
+marketing-copilot library list content --limit 20   # channel=email 레코드를 골라 본다
+marketing-copilot library list message --limit 10
 ```
 - 지난 발송의 **개봉률·수신거부율**을 먼저 본다. 수신거부가 오르고 있으면 빈도나 내용이 문제다.
 
@@ -257,7 +257,7 @@ UTM이 없으면 이메일 성과가 통째로 사라진다.
 
 ### 기록 (EML-15)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"email","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"email","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 성과는 **메시지에 귀속**한다([[messages]]). `message_id` 연결 필수.
 

@@ -13,9 +13,9 @@ description: 트렌드·키워드·고객 발화·시장 반응을 모아 출처
 
 ## 0. 준비 — 기존 신호부터 본다 (SIG-15)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3     # 유효기간 임박·경과
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --status new --limit 30
+marketing-copilot library stats
+marketing-copilot library expiring --days 3     # 유효기간 임박·경과
+marketing-copilot library list signal --status new --limit 30
 ```
 - **새로 찾기 전에 이미 있는 신호를 소진한다.** 유효기간이 지난 신호는 묻지 말고 `status: expired`로 하향하고 통보한다(SIG-15). 남은 신호 중 아직 행동으로 안 바뀐 게 있으면 그게 오늘의 1순위다.
 - 컨텍스트(`context/products.md`·`audiences.md`·`claims.md`)를 먼저 읽는다. 우리 상품·고객·쓸 수 있는 주장을 모르면 어떤 관찰도 신호가 아니다.
@@ -88,8 +88,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --status new --limi
 
 ## 6. 등록 (SIG-06~08)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add signal --json '{"kind":"keyword|voc|meme|market|measured","text":"관찰된 사실 한 줄","source_grade":"measured|customer|external|guess","ttl_days":21,"expires":"YYYY-MM-DD","related_offering":"상품명","status":"new"}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update signal <id> --json '{"status":"converted"}'   # 기회·콘텐츠로 전환됨
+marketing-copilot library add signal --json '{"kind":"keyword|voc|meme|market|measured","text":"관찰된 사실 한 줄","source_grade":"measured|customer|external|guess","ttl_days":21,"expires":"YYYY-MM-DD","related_offering":"상품명","status":"new"}'
+marketing-copilot library update signal <id> --json '{"status":"converted"}'   # 기회·콘텐츠로 전환됨
 ```
 등록은 묻지 않고 먼저 한다. 승인이 필요한 것은 **행동(게시·발주·집행)**이지 기록이 아니다.
 

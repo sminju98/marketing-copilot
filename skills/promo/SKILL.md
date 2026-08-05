@@ -13,8 +13,8 @@ description: 마감이 있는 캠페인 — 프로모션·신제품 런칭을 �
 
 ## 0. 준비 — 상품·마진·기존 캠페인 로드
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list campaign --status running
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --status validated --limit 20
+marketing-copilot library list campaign --status running
+marketing-copilot library list message --status validated --limit 20
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/products.md" 2>/dev/null || echo "(상품 컨텍스트 없음 — [[context]] 먼저)"
 ```
 - **마감일이 없으면 프로모션이 아니다.** 종료일이 안 정해졌으면 그것부터 정한다 — 상시 할인은 프로모션이 아니라 가격 인하이고, 할인 내성만 남긴다.
@@ -32,8 +32,8 @@ cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/products.md" 2>/dev/n
 - 오퍼 후보는 할인만이 아니다: **번들·수량 한정·기간 한정·사은품·무료 체험·보증/환불 조건·선착순 혜택·업그레이드.** 할인은 가장 쉽고 가장 비싼 수단이다 — 먼저 나머지를 검토한다.
 - **마진 잠식 계산은 필수다.** 할인 후 마진율로 손익분기를 다시 계산한다:
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.18   # 할인 후 마진율로 재계산
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 41000 --margin 0.18
+marketing-copilot econ breakeven --margin 0.18   # 할인 후 마진율로 재계산
+marketing-copilot econ cac --aov 41000 --margin 0.18
 ```
 - 판정 문장은 숫자로: "20% 할인 시 마진율 30%→18%, 손익분기 ROAS 3.33→5.56, 허용 CAC 15,000→7,380원. **같은 광고비로는 적자 구간**입니다." 마진이 없으면 계산하지 않고 "확인 필요"로 남긴 뒤 되묻는다(§13-7).
 - 목표 수량·목표 매출을 정하고 **역산된 필요 트래픽·필요 전환수**를 적는다. 근거 없는 목표는 목표가 아니라 희망이다.
@@ -77,7 +77,7 @@ D+1~3    종료: 종료 공지·성과 회수·회고 (7절)
 
 ## 7. 마감·종료 회고 — 다음 프로모션의 재료 (ANA-16~17)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update campaign <CMP-ID> --json '{"status":"done","actual_revenue":0,"actual_cac":0,"verdict":"...","learned":"..."}'
+marketing-copilot library update campaign <CMP-ID> --json '{"status":"done","actual_revenue":0,"actual_cac":0,"verdict":"...","learned":"..."}'
 ```
 - 회수 항목: 목표 대비 실적 / 채널별 기여 / **할인 후 실질 마진** / 신규 vs 기존 고객 비중 / 마감 임박 구간 전환 비율 / 어떤 오퍼·메시지가 이겼는가.
 - **성과는 메시지에 귀속한다**(ANA-17) — 이긴 오퍼 각도는 [[messages]] 원장에 올려 다음 프로모션과 상시 광고에서 재사용한다. 실제 CAC·가격 저항은 Business로 회신([[handoff]]).

@@ -18,8 +18,8 @@ description: 랜딩페이지 진단·전환율 개선(CRO) — PostHog 세션 �
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list campaign --status running
+marketing-copilot library list content --limit 20
+marketing-copilot library list campaign --status running
 ```
 - 지금 도는 광고 캠페인이 있으면 그 랜딩부터 본다 — **돈이 나가는 중인 페이지가 우선순위 최상단**이다.
 - 랜딩의 배포 방식(자체 레포/워드프레스/카페24·아임웹 등 빌더)을 확인한다. 코드 접근이 되면 수정~배포까지 자동 구간이 길어지고, 빌더면 수정안을 적용 단위(블록·문구)로 쪼개 준다.
@@ -79,7 +79,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list campaign --status running
 - 배포는 [P] — 승인 후 반영. 배포 직후 전환 이벤트 발화를 반드시 확인한다(고치다가 계측을 깨는 게 가장 흔한 사고).
 - 재측정은 같은 퍼널 숫자의 전후 비교로 한다. 변경은 기록한다:
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"landing","title":"{페이지}: {바꾼 요소 한 줄}","message_id":"MSG-...","status":"published"}'
+marketing-copilot library add content --json '{"channel":"landing","title":"{페이지}: {바꾼 요소 한 줄}","message_id":"MSG-...","status":"published"}'
 ```
 - 헤드라인이 이겼으면 그건 페이지의 승리가 아니라 **메시지의 승리**다 — 원장에 귀속하고([[messages]]), 그 각도를 광고·블로그·SNS로 전개한다([[repurpose]]).
 

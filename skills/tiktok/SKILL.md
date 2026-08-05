@@ -14,8 +14,8 @@ description: 틱톡·숏폼 어댑터 — 3초 훅, 15/30/60초 대본, 장면 �
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,tone,claims,audiences,channels}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status drafting --limit 5
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 10
+marketing-copilot library list content --status drafting --limit 5
+marketing-copilot library list signal --limit 10
 ```
 - [[idea]]의 정의(목표·구매단계·메시지 ID·근거·CTA)가 없으면 그쪽 먼저. **촬영 가능한 것만 쓴다** — 사용자가 찍을 수 없는 장면(드론·모델·해외 로케)을 대본에 넣지 않는다.
 
@@ -59,7 +59,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 10
 
 ## 7. 커버·썸네일 소재 — 발주 (TIK-07) ★자체 생성하지 않는다
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"BRF-...","type":"cover","spec":"1080x1920","copy":"커버 문구","status":"briefed"}'
+marketing-copilot library add asset --json '{"brief_id":"BRF-...","type":"cover","spec":"1080x1920","copy":"커버 문구","status":"briefed"}'
 ```
 - 커버·썸네일·엔드카드는 [[brief]] 표준 포맷으로 작성해 [[imagefactory]]에 발주한다. **발주는 대외 지출이므로 기본 per_item 승인.**
 - 영상 촬영·편집 자체는 사용자(또는 외주)의 몫이다. 이 플러그인은 대본·샷 리스트·자막까지 만든다.
@@ -68,7 +68,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"
 
 ## 8. 시리즈화·게시·측정 (TIK-08)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json '{"status":"ready","publish_date":"YYYY-MM-DD","utm":"utm_source=tiktok&utm_medium=organic&utm_campaign=..."}'
+marketing-copilot library update content <CON-ID> --json '{"status":"ready","publish_date":"YYYY-MM-DD","utm":"utm_source=tiktok&utm_medium=organic&utm_campaign=..."}'
 ```
 - **성과가 확인된 뒤에 시리즈로 만든다.** 1편 반응이 계정 평균 이상일 때만 2·3편 포맷을 고정하고 [[calendar]]에 리듬으로 배치한다 — 반응 없는 포맷을 시리즈로 밀면 계정 도달만 태운다.
 - 게시 전 [[publish-policy]] 게이트(클레임·표시 의무·브랜드·플랫폼 정책·퀄리티 바 5항목·승인 모드). **자동 게시는 없다(V1)** — 사람이 올린다.

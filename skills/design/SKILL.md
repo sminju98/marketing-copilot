@@ -16,7 +16,7 @@ description: 간단 이미지·제품컷·상세페이지 — 블로그 삽화·
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
+marketing-copilot library list message --limit 10
 ```
 - 브랜드 자산(로고·색·폰트) 위치를 확인한다 — 브랜드 일관성은 여기서 시작한다.
 
@@ -129,7 +129,7 @@ AI가 한글은 넣지만, **정교한 다단 레이아웃·템플릿 양산**�
 
 ## 8. 기록 (DSN-12)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"message_id":"MSG-...","type":"illustration|productcut|detail","source":"nanobanana|photoroom|canva","channel":"blog|instagram|detail","status":"delivered"}'
+marketing-copilot library add asset --json '{"message_id":"MSG-...","type":"illustration|productcut|detail","source":"nanobanana|photoroom|canva","channel":"blog|instagram|detail","status":"delivered"}'
 ```
 
 ## 다른 스킬로

@@ -13,11 +13,11 @@ description: 주간 판정 — 지난주 채널 성과를 읽고, 광고를 중�
 
 ## 0. 준비 — 지난주 데이터 로드
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list campaign --status running
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" fatigue
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 7
+marketing-copilot library stats
+marketing-copilot library unmeasured
+marketing-copilot library list campaign --status running
+marketing-copilot library fatigue
+marketing-copilot library expiring --days 7
 ```
 - **측정 커버리지가 100% 미만이면 판정 전에 기록부터 채운다**([[analyze]] ANA-16). 미기록 위에서 내린 판정은 판정이 아니라 추측이다.
 - 지난주 판정 문서가 `data/briefs/`에 있으면 이번 주와 비교한다. 없으면 비교를 생략한다(추정 금지).
@@ -30,8 +30,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 7
 
 ## 2. ★광고 판정 — 중단 / 유지 / 확대 (ADS-12~17)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3
+marketing-copilot econ breakeven --margin 0.3
+marketing-copilot econ cac --aov 50000 --margin 0.3
 ```
 캠페인마다 셋 중 하나로 **반드시 착지**시킨다. "좀 더 지켜보자"는 판정이 아니다 — 지켜볼 거면 기간과 재판정 조건을 숫자로 적는다.
 | 판정 | 조건 | 후속 |
@@ -57,9 +57,9 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3
 
 ## 5. 다음 주 캘린더 + 제작 물량 (CON-09 · IF-12~18)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status draft
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind weekly --file <파일>
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/post_slack.py" --to private --title "주간 마케팅 판정" --file <파일>
+marketing-copilot library list content --status draft
+marketing-copilot save_brief --kind weekly --file <파일>
+marketing-copilot post_slack --to private --title "주간 마케팅 판정" --file <파일>
 ```
 - **캘린더는 리듬을 배치하는 것이지 빈칸을 채우는 것이 아니다**([[calendar]]). 퀄리티 바 통과분만 슬롯에 올리고, 빈칸은 **보강 큐·검증 메시지 재활용**으로 먼저 소진한다. 슬롯이 남으면 남긴다.
 - **IF 제작 물량 산출**: 다음 주 확정 항목에서 필요한 소재를 합산한다 — 신규 생성 / A·B 변형(광고 한정) / 규격 확장 / **피로도 도달 소재의 리프레시**. `fatigue` 결과는 **성과 하락이 함께 확인될 때만** 리프레시 발주로 올린다(피로도만으로 발주를 밀지 않는다). 발주서는 [[brief]], 발주·집행은 [[imagefactory]] — **발주는 대외 지출이라 `auto`여도 기본 per_item.**

@@ -16,8 +16,8 @@ B2B에서 링크드인은 **의사결정자가 실제로 있는 거의 유일한
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=linkedin 레코드를 골라 본다
+marketing-copilot library list message --limit 10
+marketing-copilot library list content --limit 20   # channel=linkedin 레코드를 골라 본다
 ```
 - 지난 게시물을 먼저 본다 — **같은 각도를 반복하고 있지 않은지**가 첫 점검이다.
 - 검증된 메시지 원장에서 각도를 고른다([[messages]]). 콘텐츠는 소모품, 메시지가 자산이다.
@@ -31,7 +31,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # cha
 ### 자동 수집 — 여기서 먼저 뽑는다 (LIN-01)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 20
+marketing-copilot library list signal --limit 20
 ```
 
 | 소스 | 무엇 | 자동 |
@@ -63,7 +63,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 20
 사용자가 한 줄 던지면 그걸 **우선순위 1번**으로 올린다. 안 던져도 자동 소재로 돈다.
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add signal --json '{"source":"work","note":"..."}'
+marketing-copilot library add signal --json '{"source":"work","note":"..."}'
 ```
 
 특히 이런 건 기계가 절대 못 가져오므로, 사용자가 줄 때 반드시 저장한다.
@@ -196,7 +196,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add signal --json '{"source":"w
 
 ### 기록 (LIN-15)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"linkedin","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"linkedin","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 | 지표 | 왜 |
 |---|---|

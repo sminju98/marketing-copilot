@@ -14,9 +14,9 @@ description: 콘텐츠 아이디어·훅 설계 — 신호와 검증된 메시�
 ## 0. 준비 — 재료부터 본다 (CON-01)
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims,goals}.md 2>/dev/null || echo "(컨텍스트 없음 — [[context]] 먼저)"
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3
+marketing-copilot library list message --limit 10
+marketing-copilot library list signal --limit 10
+marketing-copilot library expiring --days 3
 ```
 - **빈 캘린더에서 시작하지 않는다.** 재료는 세 곳에서 온다: ① 검증된 메시지 원장([[messages]]) ② 유효기간이 남은 신호([[signals]]) ③ 판단이 끝난 기회([[opportunity]]). 셋 다 비었으면 아이디어를 지어내지 말고 [[signals]]를 먼저 돌린다.
 - 재활용 후보가 있으면 신규보다 먼저다 — 반응 좋은 **메시지**의 다른 포맷 전개는 [[repurpose]](REP-01).
@@ -53,7 +53,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3
 
 ## 5. 등록·배치 (CON-09~10)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":"...","message_id":"MSG-...","channel":"instagram","format":"carousel","status":"idea","publish_date":"YYYY-MM-DD","quality_bar":{"unique":true,"hook":true,"native":true,"action":true,"fact":true}}'
+marketing-copilot library add content --json '{"title":"...","message_id":"MSG-...","channel":"instagram","format":"carousel","status":"idea","publish_date":"YYYY-MM-DD","quality_bar":{"unique":true,"hook":true,"native":true,"action":true,"fact":true}}'
 ```
 - 통과분은 `status:"drafting"`으로 [[calendar]]에 배치(CON-09)하고, 미달분은 `status:"needs_work"`로 보강 큐에 남긴다 — 삭제하지 않는다.
 - 등록 시 **성과 슬롯**(게시 24h·7일 후 기록)을 함께 예약한다(ANA-16). 성과는 콘텐츠가 아니라 메시지 ID에 귀속(ANA-17) — [[messages]].

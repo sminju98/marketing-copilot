@@ -16,7 +16,7 @@ B2C 온라인에서 리뷰는 **두 번 일한다.** 첫째로 구매 직전 사
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,claims,channels}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=review 레코드를 골라 본다
+marketing-copilot library list content --limit 20   # channel=review 레코드를 골라 본다
 ```
 - 지금 리뷰가 몇 개이고 평점이 얼마인지부터 확인한다 — **리뷰 0개인 상품에 광고를 태우는 것**이 가장 흔한 낭비다.
 
@@ -112,7 +112,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # cha
 
 econ으로 판단한다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" --help
+marketing-copilot econ --help
 ```
 - 리뷰 1건당 비용 vs 공헌이익 → **몇 건 팔려야 본전인지**를 먼저 계산한다
 - 리뷰는 광고와 달리 **반감기가 길다**(검색에 계속 남는다) — 이걸 감안해 평가한다
@@ -197,7 +197,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" --help
 
 ### 기록 (REV-15)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"review","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"review","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 
 ---

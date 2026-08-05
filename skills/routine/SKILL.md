@@ -13,8 +13,8 @@ description: 자동 실행을 실제로 등록한다 — 매일 아침 마케팅
 
 ## 0. 준비 — 걸 수 있는 상태인지 30초 진단
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
+marketing-copilot doctor
+marketing-copilot library stats
 ```
 - 설정·컨텍스트가 비어 있으면 [[setup]]·[[context]]가 먼저다 — 빈 DB에 아침 루틴을 걸면 매일 "할 일 없음"만 온다.
 - 슬랙 웹훅(`delivery.private.slack_webhook` 또는 환경변수 `MKT_COPILOT_SLACK_PRIVATE`)이 없으면 결과가 채팅·파일로만 남는다고 알리되 **등록 자체는 막지 않는다.**
@@ -31,7 +31,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
 ## 2. 등록 — 방법 우선순위 3단계, 되는 걸로 즉시 건다
 크론식은 config `brief.morning_schedule`(기본 `0 9 * * 1-5`)·`weekly_schedule`(`0 10 * * 1`)·`monthly_schedule`(`0 10 1 * *`). 예약 프롬프트는 아래가 그대로 뱉는다:
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/schedule_brief.py" --kind morning   # weekly·monthly 동일 — 크론식+프롬프트+환경변수
+marketing-copilot schedule_brief --kind morning   # weekly·monthly 동일 — 크론식+프롬프트+환경변수
 ```
 ① **스케줄 도구로 직접 등록(기본).** 스케줄 도구(scheduled-tasks·클라우드 루틴·`/schedule`)가 보이면 3종을 지금 등록하고, **목록을 조회해 실제로 걸렸는지 확인**한다.
 ② **crontab 라인.** 도구가 없고 로컬 셸이 있으면 crontab에 추가한다(`crontab -l`로 기존 내용 확인 후 덧붙이기 — 기존 항목을 지우지 않는다):
@@ -41,7 +41,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/schedule_brief.py" --kind morning   # weekl
 ③ **클라우드 루틴 안내(수동 폴백).** 둘 다 불가하면 웹에서 New routine을 만들도록 레시피(프롬프트 + `MKT_COPILOT_SCHEDULED=1` + `MKT_COPILOT_SLACK_PRIVATE`)를 건넨다 — 이 경로만 사용자 손이 필요하다.
 - 등록이 **확인된 후에만** 상태를 기록한다(③은 사용자가 "예약 완료"라고 할 때):
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.routine_enabled=true
+marketing-copilot set_config brief.routine_enabled=true
 ```
 
 ## 3. 루틴 3종이 하는 일
@@ -63,7 +63,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.routine_enabled=true
 ## 5. 확인·수정·해제
 - **확인**: 스케줄 도구 목록 조회 / `crontab -l` / 클라우드 루틴 웹. config `brief.routine_enabled`와 실제 등록이 어긋나면 **실제 등록 상태를 믿고 config를 맞춘다.**
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.morning_schedule="0 8 * * 1-5"
+marketing-copilot set_config brief.morning_schedule="0 8 * * 1-5"
 ```
 - **수정**: 크론식을 config에 저장하고 §2와 같은 우선순위로 재등록(기존 항목 갱신·교체 — **중복 등록 금지**).
 - **해제**: 사용자가 요청할 때만 — 등록 항목 삭제 후 `set_config.py brief.routine_enabled=false`. 멋대로 끄지 않는다.

@@ -15,11 +15,11 @@ description: 통합 성과 리포트 — 흩어진 모든 채널(퍼포먼스 �
 
 ## 0. 준비 — 재료부터 로드
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 200
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list performance --limit 200
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list campaign --limit 50
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 100
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3   # 손익분기 ROAS = 1÷마진율
+marketing-copilot library list content --limit 200
+marketing-copilot library list performance --limit 200
+marketing-copilot library list campaign --limit 50
+marketing-copilot library list message --limit 100
+marketing-copilot econ breakeven --margin 0.3   # 손익분기 ROAS = 1÷마진율
 ```
 - 기간·채널을 사용자가 지정하면 그 범위, 아니면 이번 달. 커넥터가 붙어 있으면 실측 우선, 없으면 로컬 DB(`~/.marketing-copilot/library/`)의 수동 기록 + 사용자가 붙여넣은 채널 리포트로 채운다.
 - 성과 판독의 원인 분해는 [[analyze]], 추이·타율은 [[metrics]]가 본체다. 여기서는 **모아서·정규화해서·시트로 내는 것**까지.
@@ -56,7 +56,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3   # 손익�
 - **같은 메시지가 둘 이상 채널에서 반복 성과를 내면 그건 포맷 운이 아니라 메시지다** → [[messages]] 승격 후보로 리포트에 박고, [[repurpose]] 파생 대상으로 넘긴다.
 - `message_id`가 빈 성과 행은 "미귀속"으로 표시하고 사후 각도 지정을 요청한다 — 미귀속이 많을수록 메시지별 탭이 헐거워진다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"<CON-ID>","message_id":"<MSG-ID>","metrics":{"impressions":0,"clicks":0,"conversions":0,"cost":0,"revenue":0},"input_mode":"manual","source":"<출처>","note":"리포트 회수"}'
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"<CON-ID>","message_id":"<MSG-ID>","metrics":{"impressions":0,"clicks":0,"conversions":0,"cost":0,"revenue":0},"input_mode":"manual","source":"<출처>","note":"리포트 회수"}'
 ```
 
 ## 4. ★출력 = 구글 스프레드시트 3탭 (RPT-10~12)
@@ -67,7 +67,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"targe
 | **메시지별** | 메시지 × 채널 교차 | ★어떤 각도가 어디서 먹혔나 — 승격 후보 |
 - 시트 쓰기는 2경로다: **(a) 구글시트 MCP/커넥터나 Apps Script 웹훅이 붙어 있으면 직접 쓴다** — 기존 시트 URL이 있으면 탭을 갱신(덮어쓰기 전 사용자 확인), 없으면 새로 만든다. **(b) 폴백: CSV 3종을 만들어 저장하고 붙여넣기 안내**.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind monthly --file <리포트본문.md>   # 리포트 스냅샷 로컬 보관
+marketing-copilot save_brief --kind monthly --file <리포트본문.md>   # 리포트 스냅샷 로컬 보관
 ```
 - 폴백 CSV는 `~/.marketing-copilot/data/reports/{YYMM}-{탭}.csv` 3개로 만들고, "새 스프레드시트 → 가져오기(쉼표 구분) → 탭 3개" 3줄 안내를 붙인다. 시트 공유 권한 변경은 사용자 몫으로 남긴다(민감 정보 노출 방지).
 - 탭별 열 스키마(고정 — 다음 리포트도 같은 열이라 시트가 누적된다):
@@ -84,7 +84,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind monthly --file <리�
 | ② 이메일 | 이메일 커넥터(Gmail 등) 연결 시 발송, 없으면 파일 첨부 안내 | 외부 발송은 [P] |
 | ③ 시트 자동 업데이트 | 4절 (a) 경로로 지정 탭 갱신 | 내부는 [A], 공유 권한은 사용자 |
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/post_slack.py" --to private --title "통합 성과 리포트" --file <리포트본문.md>
+marketing-copilot post_slack --to private --title "통합 성과 리포트" --file <리포트본문.md>
 ```
 - 주기별로 담는 것이 다르다(소음 방지): **일**=속도형 채널 요약 + 측정 필요 슬롯, **주**=채널 성과 리뷰 + 광고 판정 + 메시지 승격 후보([[weekly-review]] 연계), **월**=비용 대비 매출·채널 수익성·예산 배분안(6절). 축적형(SEO·PR)을 매일 리포트에 넣지 않는다.
 - **마진·원가·예산 상한·미공개 캠페인은 나만 보기 채널로만.** 팀 공유본에서는 마스킹하거나 제외한다(`post_slack.py`가 내용 기반 백스톱으로 공유 채널 전송을 거부). 무인 실행 규칙·게이트는 [[routine]] 4절을 그대로 따른다 — 게시·발주·집행은 자동으로 나가지 않는다.
@@ -100,7 +100,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/post_slack.py" --to private --title "통합
 | 게시당 평균 반응 3주 연속 하락 | 빈도 축소 + 퀄리티 바 상향 | [[metrics]] · [[calendar]] |
 - 월간판은 **마케팅비 대비 매출·채널별 수익성(실제 CAC vs 허용 CAC)**을 반드시 포함한다 — 지표 정의·타율 집계는 [[metrics]]가 본체이니 그 산출을 끌어와 시트에 얹는다. **마진이 없으면 수익성 칸은 계산하지 않고 "확인 필요"로 남긴다**(§13-7).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3   # 허용 CAC vs 실제 CAC
+marketing-copilot econ cac --aov 50000 --margin 0.3   # 허용 CAC vs 실제 CAC
 ```
 
 ## 출력 (고정 포맷 — 리포트는 다음 행동으로 끝난다)

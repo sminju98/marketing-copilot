@@ -16,7 +16,7 @@ description: 어필리에이트·레퍼럴 — 성과과금(CPA/CPS) 파트너·
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,claims,goals}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3   # 허용 CAC = 커미션 상한
+marketing-copilot econ cac --aov 50000 --margin 0.3   # 허용 CAC = 커미션 상한
 ```
 
 ---
@@ -88,7 +88,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3   # �
 ## 5. 측정·정산 (AFF-13~14)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"AFF-...","message_id":"MSG-...","metrics":{"clicks":0,"conversions":0,"new_customer":0,"commission":0,"net_revenue":0},"source":"affiliate","note":"파트너별 net"}'
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"AFF-...","message_id":"MSG-...","metrics":{"clicks":0,"conversions":0,"new_customer":0,"commission":0,"net_revenue":0},"source":"affiliate","note":"파트너별 net"}'
 ```
 
 | 지표 | 왜 |

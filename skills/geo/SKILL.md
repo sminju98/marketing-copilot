@@ -18,7 +18,7 @@ description: AI 검색 노출(GEO/AEO) — AI 크롤러 허용 점검, 질문형
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
+marketing-copilot library list content --limit 20
 ```
 - 발행 글 목록에서 **리라이트 후보**부터 본다 — geo의 기본 동작은 새 글이 아니라 기존 글 손질이다(GEO-05).
 - geo 본편은 **자체 도메인**에서 성립한다 — robots.txt와 구조화 데이터를 만질 수 있어야 한다. 네이버 블로그 같은 플랫폼 지면은 ②질문형 구조·⑤정의·표 두 가지만 적용 가능하고, 나머지는 자체 도메인으로 푼다(BLG-18).
@@ -77,7 +77,7 @@ curl -sI -A "GPTBot" "https://{도메인}/" | head -1   # robots가 깨끗해도
 - **질문 세트 10~20개**: `audiences.md`의 고객 언어 + [[signals]]의 실제 발화로 만든다. 우리 브랜드명이 아니라 **고객이 살 물건을 고를 때 AI에 묻는 문장**으로.
 - **주기는 월간**(블로그 월간 리듬과 함께). ChatGPT·Perplexity·구글 AI 검색에 같은 질문을 던져 ①우리 인용 여부 ②인용된 문구 ③경쟁사 인용을 기록한다 — 반복 작업이라 자동화 대상이고, 전용 유료 도구(Profound 등)는 인용이 잡히기 시작한 뒤에 검토한다(결제는 돈 나가는 확대 — 승인 대상).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add signal --json '{"type":"geo-citation","query":"...","engine":"perplexity","cited":true,"cited_url":"...","competitor_cited":"...","date":"2026-08-03"}'
+marketing-copilot library add signal --json '{"type":"geo-citation","query":"...","engine":"perplexity","cited":true,"cited_url":"...","competitor_cited":"...","date":"2026-08-03"}'
 ```
 - **AI 경유 유입 분리**: GA에서 리퍼러(chatgpt.com·perplexity.ai 등) 세그먼트로 떼어, 전환율을 일반 오가닉과 비교한다. "AI 경유 전환율이 높다"는 남의 보고를 **우리 숫자로 확인**하는 절차다 — 커넥터가 없으면 "확인 필요".
 - **성과는 메시지에 귀속**: 인용된 글의 `message_id`로 기록한다([[messages]]). 어떤 각도가 인용을 부르는지가 자산이다. 본문 링크는 blog 규칙대로 UTM 필수 — 측정 없는 게시 금지.

@@ -13,9 +13,9 @@ description: 퍼포먼스 광고를 설계·집행·판정한다 — 집행 전 
 
 ## 0. 준비 — 예산 상한과 진행 중 캠페인 먼저
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list campaign --status running
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list opportunity --status approved
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
+marketing-copilot library list campaign --status running
+marketing-copilot library list opportunity --status approved
+marketing-copilot doctor
 ```
 - `config.json`의 `ads.enabled`·`daily_budget_cap`·`monthly_budget_cap`·`require_stop_condition`을 먼저 읽는다. **상한은 하드 게이트다** — 넘는 설계는 만들지 않고 [E]로 올린다.
 - 이미 도는 캠페인의 판정이 밀려 있으면 **새 캠페인보다 그 판정이 먼저다.** 돈이 나가는 중인 건이 우선순위 최상단(§2-4 정밀형).
@@ -37,9 +37,9 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
 
 ## 3. 돈 계산 — 세 숫자 없이는 설계가 아니다 (ADS-07~08 · §2-5)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3          # 손익분기 ROAS = 1 ÷ 마진율
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3    # 허용 CAC
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000              # 최소 테스트 예산 = 허용 CAC × 10~20
+marketing-copilot econ breakeven --margin 0.3          # 손익분기 ROAS = 1 ÷ 마진율
+marketing-copilot econ cac --aov 50000 --margin 0.3    # 허용 CAC
+marketing-copilot econ budget --cac 15000              # 최소 테스트 예산 = 허용 CAC × 10~20
 ```
 - 암산 금지 — 스크립트 출력을 그대로 쓴다. **최소 테스트 예산이 상한을 넘으면 "판정 불가 규모"라고 먼저 말한다.** 전환 10~20건이 안 나오는 예산은 돈만 쓰고 배우는 게 없다 → 이때는 광고 대신 오가닉·커뮤니티 경로를 제안한다([[opportunity]]).
 
@@ -48,7 +48,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000              # 
 - 형식은 항상 "언제·무엇이·얼마를 넘으면 중단": "테스트 예산 50% 소진 시점에 CPA가 허용 CAC의 1.5배 초과 시 중단" / "7일간 전환 0건이면 중단" / "일 소진이 일 상한의 130%를 넘으면 즉시 알림·일시정지".
 - 확대 조건도 같이 적는다: "CPA가 허용 CAC의 70% 이하로 3일 유지되면 예산 {n}% 증액"(증액도 [P] 승인).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add campaign --json '{"name":"...","goal":"conversion","audience":"...","offer":"...","message_id":"MSG-…","channel":"meta|google|kakao|naver","budget":500000,"budget_daily":50000,"breakeven_roas":3.33,"allowed_cac":15000,"stop_condition":"...","scale_condition":"...","verdict_days":5,"status":"planned"}'
+marketing-copilot library add campaign --json '{"name":"...","goal":"conversion","audience":"...","offer":"...","message_id":"MSG-…","channel":"meta|google|kakao|naver","budget":500000,"budget_daily":50000,"breakeven_roas":3.33,"allowed_cac":15000,"stop_condition":"...","scale_condition":"...","verdict_days":5,"status":"planned"}'
 ```
 
 ## 5. 소재·A/B 가설 → 발주 (ADS-09) — 소재는 무조건 [[imagefactory]]
@@ -130,7 +130,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add campaign --json '{"name":".
 - 주기는 `cadence.ads_verdict_days`(기본 5일). 판정은 셋 중 하나로만 끝난다: **중단 / 유지(변경 없이 더 본다) / 확대(증액·확장)**. "일단 지켜보자"는 판정이 아니다.
 - 성과는 `performance`에 기록하고 **메시지 ID에 귀속**한다(ANA-17) — 이겼으면 그 메시지를 오가닉·콜드메일로 전개할 수 있다([[messages]]·[[repurpose]]). 실제 CAC·전환은 Business로 회신한다([[handoff]]).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update campaign <CMP-ID> --json '{"status":"stopped|running|paused","verdict":"중단|유지|확대 + 사유","actual_cac":0,"actual_roas":0}'
+marketing-copilot library update campaign <CMP-ID> --json '{"status":"stopped|running|paused","verdict":"중단|유지|확대 + 사유","actual_cac":0,"actual_roas":0}'
 ```
 
 ## 출력 (설계·판정 공통)

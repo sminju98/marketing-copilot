@@ -14,8 +14,8 @@ description: 블로그·SEO 어댑터 — 검색의도 판정, 키워드, 경쟁
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims,goals}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status published --limit 20
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
+marketing-copilot library list content --status published --limit 20
+marketing-copilot library list message --limit 10
 ```
 - 기존 발행 글 목록을 먼저 본다 — **새 글보다 기존 글 업데이트가 나은 경우가 자주 있다**(BLG-12). 같은 키워드로 두 편을 쓰면 서로 순위를 잡아먹는다(카니발라이제이션).
 - 검색량·순위는 커넥터(Search Console 등)가 있으면 실측을, 없으면 **"확인 필요"로 남긴다** — 검색량 숫자를 지어내지 않는다.
@@ -50,7 +50,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
 
 ## 6. 메타·내부링크·CTA (BLG-08~09)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":"...","message_id":"MSG-...","channel":"blog","format":"article","status":"draft","utm":"utm_source=blog&utm_medium=organic&utm_campaign=..."}'
+marketing-copilot library add content --json '{"title":"...","message_id":"MSG-...","channel":"blog","format":"article","status":"draft","utm":"utm_source=blog&utm_medium=organic&utm_campaign=..."}'
 ```
 - **메타**(BLG-08): title(주 키워드 포함, 클릭할 이유 포함) · description(2줄, 검색결과에서 읽히는 카피) · slug · 대표 이미지 alt · 기존 글로 거는 **내부링크 2~4개**(주제 클러스터 형성).
 - **CTA·전환 경로**(BLG-09): 의도에 맞는 다음 행동 하나(정보형=구독·다음 글, 비교형=상세·문의, 거래형=구매). 링크에는 **UTM 필수** — 측정 없는 게시 금지.
@@ -61,8 +61,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":".
 
 ## 8. 성과 추적·구주제 업데이트 (BLG-11~12) — 월간 리듬
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json '{"status":"published","url":"https://..."}'
+marketing-copilot library unmeasured
+marketing-copilot library update content <CON-ID> --json '{"status":"published","url":"https://..."}'
 ```
 - **성과 추적**(BLG-11): 블로그는 게시 24시간이 아니라 **4주·8주·12주 시점**에 본다(리드타임). 노출·순위·유입·전환을 기록하고 성과는 메시지 ID에 귀속(ANA-17). 커넥터가 없으면 수동 기록 슬롯을 큐에 넣는다(ANA-16).
 - **구주제 업데이트 큐**(BLG-12): 월간 리뷰에서 ① 순위가 떨어진 글 ② 정보가 낡은 글 ③ 순위 2~3페이지에 걸린 아까운 글을 뽑아 **새 글보다 먼저** 갱신한다. 갱신은 신규 발행보다 비용 대비 효율이 높다. 월간 흐름은 [[weekly-review]]·[[analyze]]와 함께 돈다.

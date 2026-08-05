@@ -16,8 +16,8 @@ description: CRM·인바운드 — HubSpot을 원장으로 컨택트·딜·세�
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims,channels}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 10
+marketing-copilot library list message --limit 10
+marketing-copilot library list signal --limit 10
 ```
 - `channels.md`에 상담 도구(채널톡 등)·연동 여부가 없으면 [[context]]로 등록한다.
 - 상담 로그가 있으면 먼저 훑는다 — **반복 질문 3개가 이번 주 콘텐츠 소재다.**
@@ -143,7 +143,7 @@ CRM은 두 층이고, 둘은 경쟁이 아니라 역할이 다르다.
 ## 6. 측정 (CRM-11~12)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"CON-...","note":"crm 주간","metrics":{"chats":0,"resolved":0,"handoff":0}}'
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"CON-...","note":"crm 주간","metrics":{"chats":0,"resolved":0,"handoff":0}}'
 ```
 
 | 지표 | 왜 |

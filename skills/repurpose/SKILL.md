@@ -13,9 +13,9 @@ description: 재활용 확장 — 반응 좋았던 "메시지"를 찾아 1개 �
 
 ## 0. 준비 — 성과가 붙은 것부터 (REP-01)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 15
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status published --limit 20
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
+marketing-copilot library list message --limit 15
+marketing-copilot library list content --status published --limit 20
+marketing-copilot library unmeasured
 ```
 - **성과가 기록된 콘텐츠만 재활용 후보다.** `unmeasured`가 잔뜩 나오면 재활용보다 성과 기록이 먼저다(ANA-16) — 근거 없이 우려먹으면 실패를 복제한다.
 - 후보 선정 기준은 절대 수치가 아니라 **계정 평균 대비**(저장·공유·댓글·문의). 조회수만 높고 행동이 없던 것은 후보가 아니다.
@@ -29,7 +29,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
 | **일회성 노출** | 외부 공유·알고리즘 운·시기 이슈 | 재활용하지 않는다 |
 - 판정 결과를 메시지 원장에 기록한다 — 검증 횟수가 쌓인 메시지가 다음 분기의 카피·랜딩·콜드메일 첫 줄이 된다([[messages]], Sales와 양방향 동기화).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update message <MSG-ID> --json '{"uses":2,"proof":"CON-.. 저장률 계정평균 2.1배","status":"validated"}'
+marketing-copilot library update message <MSG-ID> --json '{"uses":2,"proof":"CON-.. 저장률 계정평균 2.1배","status":"validated"}'
 ```
 
 ## 2. 원본 해부 (REP-02~03)
@@ -60,15 +60,15 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update message <MSG-ID> --json 
 
 ## 5. 배너·규격 — 발주로 넘긴다 (REP-10)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"BRF-...","type":"banner","spec":"지면별 규격 목록","variants":20,"message_id":"MSG-...","status":"briefed"}'
+marketing-copilot library add asset --json '{"brief_id":"BRF-...","type":"banner","spec":"지면별 규격 목록","variants":20,"message_id":"MSG-...","status":"briefed"}'
 ```
 - 배너 20종·리사이즈·리프레시는 **자체 구현하지 않는다**([[method]]). [[brief]] 표준 포맷으로 발주서를 쓰고 [[imagefactory]]로 넘긴다 — **브리프는 표준 포맷이라 다른 디자이너·제작사에게도 그대로 전달 가능하다.**
 - 발주는 대외 지출이므로 기본 per_item 승인이고, 예산 상한을 브리프에 적는다.
 
 ## 6. 기록·성과 회수 (REP-11~12)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":"...","channel":"blog","format":"post","message_id":"MSG-...","parent_id":"CON-원본","status":"draft"}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update message <MSG-ID> --json '{"uses":<파생 누계>,"performance_note":"파생 CON-.. / CON-.."}'
+marketing-copilot library add content --json '{"title":"...","channel":"blog","format":"post","message_id":"MSG-...","parent_id":"CON-원본","status":"draft"}'
+marketing-copilot library update message <MSG-ID> --json '{"uses":<파생 누계>,"performance_note":"파생 CON-.. / CON-.."}'
 ```
 - 모든 파생에 **원본 링크(`parent_id`)와 메시지 ID**를 건다. 성과는 파생 콘텐츠가 아니라 메시지에 누적된다(ANA-17).
 - 판정 지표는 확장 배수가 아니라 **파생물 중 계정 평균 이상 성과 비율**([[method]]). 이 비율이 떨어지면 배수를 줄이고 원본 선별을 조인다.

@@ -16,7 +16,7 @@ PR에서 가장 흔한 실패는 나쁜 보도자료를 쓰는 게 아니라 **�
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,claims,goals}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=pr 레코드를 골라 본다
+marketing-copilot library list content --limit 20   # channel=pr 레코드를 골라 본다
 ```
 - 지난 보도자료를 먼저 본다 — **같은 소재를 재탕하고 있지 않은지**, 최근 발행 간격이 너무 짧지 않은지.
 
@@ -233,7 +233,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # cha
 
 ### 기록 (PR-15)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"pr","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"pr","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 | 지표 | 왜 |
 |---|---|

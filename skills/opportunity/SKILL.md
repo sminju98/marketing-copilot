@@ -13,9 +13,9 @@ description: 돈 될 기회를 먼저 찾아 손익분기 ROAS·허용 CAC·최�
 
 ## 0. 준비 — 신호와 마진을 먼저 로드
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --status new --limit 30
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3      # 유효기간 임박 신호·기회
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list opportunity --status proposed
+marketing-copilot library list signal --status new --limit 30
+marketing-copilot library expiring --days 3      # 유효기간 임박 신호·기회
+marketing-copilot library list opportunity --status proposed
 ```
 - `config.json`의 `offerings[].price`·`margin_rate`와 `context/products.md`를 확인한다. **마진율이 없으면 3단계로 가기 전에 되묻는다**(§4·§13-7).
 - 이미 제안했는데 처리 안 된 기회(`proposed`)가 있으면 새 기회를 만들기 전에 그걸 먼저 판정한다 — 제안만 쌓는 스킬이 되면 실패다.
@@ -31,9 +31,9 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list opportunity --status propo
 
 ## 2. 돈 계산 — 공식을 반드시 돌린다 (OPP-14 · §2-5)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3          # 손익분기 ROAS = 1 ÷ 마진율
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3    # 허용 CAC (재구매 있으면 --ltv)
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000              # 최소 테스트 예산 = 허용 CAC × 10~20
+marketing-copilot econ breakeven --margin 0.3          # 손익분기 ROAS = 1 ÷ 마진율
+marketing-copilot econ cac --aov 50000 --margin 0.3    # 허용 CAC (재구매 있으면 --ltv)
+marketing-copilot econ budget --cac 15000              # 최소 테스트 예산 = 허용 CAC × 10~20
 ```
 - 손익분기 ROAS·허용 CAC·최소 테스트 예산 **세 숫자가 없는 제안은 제안이 아니다.** 암산하지 말고 스크립트를 돌려 그 출력을 그대로 쓴다.
 - 최소 테스트 예산이 사용자의 월 예산 상한(`ads.monthly_budget_cap`)을 넘으면 **판정 불가 규모**임을 먼저 말한다 — 전환 10~20건이 안 나오는 예산은 돈만 쓰고 배우는 게 없다. 이때는 광고 대신 오가닉·커뮤니티 경로를 제안한다.
@@ -59,8 +59,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000              # 
 
 ## 6. 기록·승격 (OPP-19~20)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add opportunity --json '{"title":"...","offering":"상품","audience":"누구에게","evidence":"관찰된 근거+출처","evidence_grade":"measured|partial|hypothesis","expected_effect":"범위+산출근거","channel":"ads|instagram|blog|community","test_budget":500000,"breakeven":"ROAS 3.33 / 허용 CAC 15,000원","stop_condition":"...","expires":"YYYY-MM-DD","status":"proposed"}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update signal <SIG-ID> --json '{"status":"converted"}'
+marketing-copilot library add opportunity --json '{"title":"...","offering":"상품","audience":"누구에게","evidence":"관찰된 근거+출처","evidence_grade":"measured|partial|hypothesis","expected_effect":"범위+산출근거","channel":"ads|instagram|blog|community","test_budget":500000,"breakeven":"ROAS 3.33 / 허용 CAC 15,000원","stop_condition":"...","expires":"YYYY-MM-DD","status":"proposed"}'
+marketing-copilot library update signal <SIG-ID> --json '{"status":"converted"}'
 ```
 승인되면 `status: approved` → 실행 스킬로 넘긴다: 광고 [[ads]] / 프로모션·런칭 [[promo]] / 콘텐츠 [[idea]]·[[blog]]·[[instagram]]·[[tiktok]] / 소재 발주 [[brief]]·[[imagefactory]]. 실행되면 `running`, 판정은 [[analyze]]·[[weekly-review]].
 

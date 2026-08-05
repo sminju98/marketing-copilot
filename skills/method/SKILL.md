@@ -29,9 +29,9 @@ Marketing Copilot은 마케팅 전략서를 써주는 도구가 아니라, **오
 
 ## 0. 상태 파악 — 전략이 아니라 '측정 부채'부터 본다
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured      # 게시했는데 성과 기록 없는 콘텐츠
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3
+marketing-copilot library stats
+marketing-copilot library unmeasured      # 게시했는데 성과 기록 없는 콘텐츠
+marketing-copilot library expiring --days 3
 ```
 - `unmeasured`가 비어 있지 않으면 그게 최우선이다. 새 콘텐츠를 한 편 더 만드는 것보다 **이미 나간 게시물의 성과를 기록해 메시지에 귀속시키는 게 먼저다**(철학 6·ANA-16).
 - **커넥터 우선(connector-first) — 성능이 1번이다.** 커넥터(HubSpot·GA4·Search Console·광고계정·SNS 인사이트·발행 MCP)가 붙어 있으면 **그게 기본 경로다**: 실측 데이터를 읽고, 실제 발송·게시를 실행한다. 로컬 DB(`~/.marketing-copilot/library/`)는 **폴백(보험)이지 기본값이 아니다** — 연결이 없어 멈추는 것을 막는 용도이고, 폴백으로 돌고 있으면 매번 "연결하면 이게 실측·자동 실행으로 바뀝니다"를 알린다.
@@ -86,9 +86,9 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3
 
 ## 5. 돈 공식 — 손익 계산이 편집 방향을 정한다 (§2-5)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000
+marketing-copilot econ breakeven --margin 0.3
+marketing-copilot econ cac --aov 50000 --margin 0.3
+marketing-copilot econ budget --cac 15000
 ```
 ```
 손익분기 ROAS = 1 ÷ 마진율            (마진율 30% → ROAS 3.33 이하는 적자)

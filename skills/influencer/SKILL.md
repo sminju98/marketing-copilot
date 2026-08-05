@@ -16,7 +16,7 @@ B2C 초기에 인플루언서·체험단이 주력인 이유는 두 가지다. �
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=influencer 레코드를 골라 본다
+marketing-copilot library list content --limit 20   # channel=influencer 레코드를 골라 본다
 ```
 - 과거 발주 이력을 먼저 본다 — 같은 인플루언서 재발주면 지난 성과가 단가 협상의 근거가 된다.
 
@@ -77,7 +77,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # cha
 ### 계산 (INF-06)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3   # 허용 CAC
+marketing-copilot econ cac --aov 50000 --margin 0.3   # 허용 CAC
 ```
 
 ```
@@ -143,7 +143,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3   # �
 게시가 끝이 아니라 회수가 끝이다.
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"influencer","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"influencer","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 
 | 회수 항목 | 어디로 |

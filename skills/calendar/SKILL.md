@@ -13,10 +13,10 @@ description: 콘텐츠 캘린더 — 채널별 게시 리듬을 잡고 속도형
 
 ## 0. 준비 — 채널 리듬과 재고를 먼저 본다
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status draft --limit 30
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status scheduled --limit 30
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --status validated --limit 20
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 7
+marketing-copilot library list content --status draft --limit 30
+marketing-copilot library list content --status scheduled --limit 30
+marketing-copilot library list message --status validated --limit 20
+marketing-copilot library expiring --days 7
 ```
 - `config.json`의 `channels.active`(운영 중)와 `wanted`(시작하고 싶은 것)를 구분한다. **wanted 채널을 active처럼 채우지 않는다** — 새 채널은 최소 리듬 하나부터 시작한다.
 - 검증된 메시지 재고(`validated`)가 캘린더의 진짜 연료다. 재고가 없으면 칸 수를 늘리지 말고 [[messages]]·[[repurpose]]부터 돌린다.
@@ -51,7 +51,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 7
 - 주간 판정([[weekly-review]])에서 다음 주 캘린더를 확정하고, 필요한 소재 물량을 산출해 [[brief]]·[[imagefactory]]로 넘긴다.
 - **경보:** 게시당 평균 반응이 3주 연속 하락하면 칸을 늘리지 말고 **줄인다** — 빈도를 낮추고 바를 올리는 게 먼저다(§13-3).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <id> --json '{"status":"scheduled","publish_date":"YYYY-MM-DD","channel":"instagram","message_id":"MSG-..."}'
+marketing-copilot library update content <id> --json '{"status":"scheduled","publish_date":"YYYY-MM-DD","channel":"instagram","message_id":"MSG-..."}'
 ```
 
 ## 출력 (data/calendar/<YYYY-Www>.md 저장)

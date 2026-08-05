@@ -18,7 +18,7 @@ description: 네이버 카페 공식 입점·제휴 — 우리 고객이 모인 
 ## 0. 준비 — 손익 계산의 재료부터 (CAF-01)
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
+marketing-copilot library list content --limit 20
 ```
 - `audiences.md`의 타깃이 어느 카페에 모여 있는지가 출발점이다. 모르면 `skills/comment/communities-kr.md`(분야별 국내 대표 커뮤니티 44곳 — 규모·홍보 규정·공식 진입 경로)를 먼저 편다.
 - 마진율·객단가가 컨텍스트에 없으면 5절의 손익 계산이 안 돈다 — [[context]]로 먼저 채운다.
@@ -76,8 +76,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
 ## 5. ★손익 계산 — 입점비는 CAC로 환산해야 보인다 (CAF-09~11)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3    # 허용 CAC (재구매 있으면 --ltv)
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3          # 손익분기 ROAS = 1 ÷ 마진율
+marketing-copilot econ cac --aov 50000 --margin 0.3    # 허용 CAC (재구매 있으면 --ltv)
+marketing-copilot econ breakeven --margin 0.3          # 손익분기 ROAS = 1 ÷ 마진율
 ```
 
 핵심 공식 하나: **필요 전환 수 = 입점비 ÷ 허용 CAC.** 월 입점비를 허용 CAC로 나누면 "이 카페에서 한 달에 몇 명이 사야 본전인가"가 나온다. 이 숫자를 카페의 성과 자료·수요 밀도(2절 ②)에 대본다.
@@ -113,8 +113,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3          # 
 ## 8. 성과 회수 → 연장/중단 판정 (CAF-15~16)
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":"{카페} 입점 게시물","channel":"cafe","format":"placement","message_id":"MSG-...","status":"published","source_url":"..."}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","input_mode":"manual","metrics":{"views":0,"clicks":0,"inquiries":0,"conversions":0},"note":"입점 {n}주차"}'
+marketing-copilot library add content --json '{"title":"{카페} 입점 게시물","channel":"cafe","format":"placement","message_id":"MSG-...","status":"published","source_url":"..."}'
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","input_mode":"manual","metrics":{"views":0,"clicks":0,"inquiries":0,"conversions":0},"note":"입점 {n}주차"}'
 ```
 - 기간 말 실제 CAC = 입점비 ÷ 실제 전환 수. **실제 CAC ≤ 허용 CAC → 연장 상신[P] / 초과 → 연장 안 함이 자동 기본값** — 돈을 안 쓰는 방향은 승인이 필요 없다.
 - 입점 글에 달리는 질문·문의 댓글은 [[comment]] 큐로 넘겨 답한다 — 질문이 쌓이는 카페가 연장 1순위다.

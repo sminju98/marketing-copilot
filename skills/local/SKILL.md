@@ -16,7 +16,7 @@ description: 네이버 스마트플레이스·로컬 SEO — 플레이스 등록
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=local 레코드(소식·쿠폰·메시지)를 골라 본다
+marketing-copilot library list content --limit 20   # channel=local 레코드(소식·쿠폰·메시지)를 골라 본다
 ```
 - 오프라인 접점이 없는 순수 온라인 사업이면 이 스킬은 후순위다 — [[blog]]·[[instagram]]으로.
 - 업체명·주소·영업시간·가격은 **컨텍스트에 있는 값만** 쓴다. 없으면 지어내지 말고 "확인 필요"로 비워서 사용자에게 채우게 한다.
@@ -61,7 +61,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # cha
 
 ## 4. 소식·쿠폰 — 살아있는 가게라는 신호 (LOC-04)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":"...","message_id":"MSG-...","channel":"local","format":"news","status":"draft"}'
+marketing-copilot library add content --json '{"title":"...","message_id":"MSG-...","channel":"local","format":"news","status":"draft"}'
 ```
 - 소식: 신메뉴·이벤트·휴무·시즌 안내. 초안은 자동, 게시는 승인 후 사람이 센터 버튼으로. **빈도 목표를 두지 않는다** — 알릴 게 없으면 안 올린다(양치기 금지).
 - 쿠폰: 오퍼(할인율·조건)는 마진 잠식 계산과 함께 설계한다 — [[promo]]. 수치는 products.md 마진 데이터로만.

@@ -13,7 +13,7 @@ description: 마케팅 컨텍스트 구축·갱신 — 로컬·커넥터 자료�
 
 ## 0. 준비 — 현재 상태 진단 (§5 구조)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
+marketing-copilot doctor
 mkdir -p "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context"
 ls "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"
 ```
@@ -22,7 +22,7 @@ ls "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"
 
 ## 1. 자료 자동 탐색 (CTX-01)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/find_docs.py"
+marketing-copilot find_docs
 ```
 - 로컬 PC에서 브랜드 가이드·상품 소개서·가격표·상세페이지 카피·광고 소재 카피·보도자료·기존 콘텐츠·성과 리포트를 찾아 읽는다. 노션·구글드라이브 커넥터가 연결돼 있으면 그쪽을 우선하고, 미연결이면 로컬만으로 동작한다.
 - **형제 플러그인 컨텍스트 가져오기 (CTX-12)**: `~/.business-copilot/context/`(포지셔닝·고객군·가격)와 `~/.sales-copilot/context/`(반론·먹힌 메시지·사례)가 있으면 읽어와 중복 질문을 줄인다. config `links.use_business_context=true`일 때만.

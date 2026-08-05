@@ -13,9 +13,9 @@ description: 성과 판독 — 게시물·캠페인 성과를 회수해 메시�
 
 ## 0. 준비 — 측정 부채부터 본다
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list performance --limit 100
+marketing-copilot library stats
+marketing-copilot library unmeasured
+marketing-copilot library list performance --limit 100
 ```
 - `stats`의 **측정 커버리지**(게시물 중 성과가 기록된 비율)가 내부 1순위 KPI다(§11). 100% 미만이면 **분석보다 기록이 먼저** — 2절로 바로 간다.
 - 커넥터(GA4·Search Console·광고계정·SNS 인사이트·매출)가 붙어 있으면 실측 우선, 없으면 로컬 최소 마케팅 DB(`~/.marketing-copilot/library/`)만으로 전부 동작한다.
@@ -36,8 +36,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list performance --limit 100
 2. **얼마나 반응했나** (좋아요·저장·공유·댓글 중 아는 것만)
 3. **문의·클릭·구매가 왔나** (0이면 0이라고 적는다 — 0도 데이터다)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"<CON-ID>","message_id":"<MSG-ID>","metrics":{"reach":0,"saves":0,"comments":0,"inquiries":0},"input_mode":"manual","source":"instagram_insights","note":"게시 7일차"}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json '{"status":"published"}'
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"<CON-ID>","message_id":"<MSG-ID>","metrics":{"reach":0,"saves":0,"comments":0,"inquiries":0},"input_mode":"manual","source":"instagram_insights","note":"게시 7일차"}'
+marketing-copilot library update content <CON-ID> --json '{"status":"published"}'
 ```
 - **모르는 칸은 비워 둔다.** 어림수를 대신 채워 넣지 않는다 — 지어낸 숫자가 들어가면 메시지 원장 전체가 오염된다.
 - 사용자가 "그건 못 봤다"고 하면 그 항목은 영구 포기가 아니라 **다음 회수 시점으로 이월**한다. 기록을 거부하면 그 게시물의 메시지는 "검증 불가"로 남고, [[messages]]에서 승격되지 않는다.
@@ -45,7 +45,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <CON-ID> --json 
 
 ## 3. ★성과 → 메시지 귀속 (ANA-17)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --status validated
+marketing-copilot library list message --status validated
 ```
 - 모든 performance 레코드에 `message_id`를 반드시 단다. 성과를 **콘텐츠에 귀속시키면 휘발되고, 메시지(각도)에 귀속시키면 쌓인다**(§2-3).
 - 잘된 게 "그 카드뉴스"인지 "그 각도"인지 구분한다: 같은 메시지의 다른 포맷·다른 채널 성과를 나란히 놓아 본다. **같은 메시지가 서로 다른 지면에서 반복 성과를 내면 그건 포맷 운이 아니라 메시지다** → [[messages]]로 승격 심사.
@@ -69,8 +69,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --status validated
 - **양이 아니라 바를 조정한다**: 게시당 평균 반응이 3주 연속 하락하면 "더 올리자"가 아니라 **"빈도를 줄이고 퀄리티 바를 올려라"를 먼저 제안한다**(§13-3). 추이 판정은 [[metrics]]가 맡는다.
 - 형제 플러그인 반영: 실제 CAC·전환·가격 저항은 Business로, 구매·제휴 신호는 Sales로 → [[handoff]].
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3   # 허용 CAC 대비 실제 CAC 비교
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind monthly --file <파일>
+marketing-copilot econ cac --aov 50000 --margin 0.3   # 허용 CAC 대비 실제 CAC 비교
+marketing-copilot save_brief --kind monthly --file <파일>
 ```
 
 ## 출력 (고정 포맷 — "이번 주 가장 돈 될 가능성이 높은 행동")

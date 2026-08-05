@@ -13,9 +13,9 @@ description: 검증된 메시지 원장 — 먹힌 각도를 근거·성과·사
 
 ## 0. 준비 — 원장 로드
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --status validated
+marketing-copilot library stats
+marketing-copilot library list message
+marketing-copilot library list message --status validated
 ```
 - `stats`의 **검증된 메시지 건수**가 이 플러그인의 자산 잔고다. 0건이면 지금까지의 활동이 학습으로 전환되지 않았다는 뜻 — [[analyze]]의 성과 기록부터 채운다.
 - 메시지 레코드 칸: `angle`(각도 한 문장) · `proof`(근거 실물) · `source`(출처·등급) · `performance_note`(성과 요약) · `uses`(사용 횟수) · `synced_to_sales` · `status`.
@@ -23,7 +23,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --status validated
 ## 1. 메시지 한 줄 정의 (MSG 등록)
 **메시지는 주제가 아니라 각도다.** "우리 서비스 소개"는 메시지가 아니고, "소재 제작에 걸리는 3일을 10분으로 줄인다"가 메시지다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add message --json '{"angle":"소재 제작 리드타임 단축","proof":"자사 작업 로그: 평균 3일 → 10분","source":"measured","status":"candidate"}'
+marketing-copilot library add message --json '{"angle":"소재 제작 리드타임 단축","proof":"자사 작업 로그: 평균 3일 → 10분","source":"measured","status":"candidate"}'
 ```
 - **한 문장·한 각도.** 두 각도가 붙어 있으면 성과가 어느 쪽에 귀속되는지 알 수 없어 원장이 오염된다 — 쪼개서 각각 등록한다.
 - **근거는 실물로.** 출처 등급(SIG-16)을 붙인다: **실측(자사 데이터·판매) > 고객 발화(VOC·리뷰·문의·영업 회신) > 외부 관찰(검색량·경쟁사) > 추측.** 추측 등급 단독 메시지는 등록은 되지만 `candidate`를 벗어나지 못한다.
@@ -36,7 +36,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add message --json '{"angle":"�
 3. 성과가 `message_id`로 **귀속 기록된 것**만 근거로 인정(ANA-17). 기억·인상은 근거가 아니다.
 4. 표본이 작으면(반응 분모 5 미만, 광고 전환 10건 미만) **승격하지 않고 후보 유지** — "판정 불가"가 정답이다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update message <MSG-ID> --json '{"status":"validated","performance_note":"인스타 계정평균 2.1배(7/12) · 블로그 유입 3위(8주차)","uses":4}'
+marketing-copilot library update message <MSG-ID> --json '{"status":"validated","performance_note":"인스타 계정평균 2.1배(7/12) · 블로그 유입 3위(8주차)","uses":4}'
 ```
 - 승격되면 [[repurpose]]·[[ads]]·[[brief]]가 이 각도를 우선 사용한다. **검증된 메시지가 있는데 새 각도를 즉흥으로 만들지 않는다.**
 
@@ -46,7 +46,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update message <MSG-ID> --json 
 - 근거가 만료됐다(가격·기능·정책 변경으로 `proof`가 더 이상 사실이 아님 → 즉시 은퇴, 사용 중이면 게시 중지)
 - 포지셔닝·브랜드 방향 변경([E] 상신 사안), 경쟁사가 같은 각도를 선점해 차별성이 사라짐
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update message <MSG-ID> --json '{"status":"retired","performance_note":"근거 만료: 2026-07 가격 개편으로 수치 무효"}'
+marketing-copilot library update message <MSG-ID> --json '{"status":"retired","performance_note":"근거 만료: 2026-07 가격 개편으로 수치 무효"}'
 ```
 
 ## 4. ★Sales Copilot 양방향 동기화 (§2-3 · §8)

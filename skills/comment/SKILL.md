@@ -14,7 +14,7 @@ description: 커뮤니티·카페·오픈채팅·레딧 댓글 큐 — 도움이
 ## 0. 준비 — 어디를 보는지부터 (VIR-01~04)
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims,channels}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 10
+marketing-copilot library list signal --limit 10
 ```
 - `channels.md`의 커뮤니티 목록(카페·오픈채팅·레딧·슬랙/디스코드·Q&A)이 감시 대상이다. 목록이 없으면 [[context]]로 먼저 등록한다 — **아무 데나 들어가서 답을 달지 않는다.**
 - **어느 커뮤니티에 우리 고객이 있는지 모르면** 이 스킬 폴더의 `communities-kr.md`(분야별 국내 대표 커뮤니티 44곳 — 규모·홍보 규정·공식 진입 경로)를 먼저 편다.
@@ -57,8 +57,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 10
 
 ## 4. 큐 생성 — 게시는 사람이 (VIR-13~14)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"title":"<커뮤니티/스레드 요지>","channel":"community","format":"comment","mode":"help_only|disclosed","message_id":"MSG-...","status":"ready","source_url":"..."}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/queue_today.py" --build
+marketing-copilot library add content --json '{"title":"<커뮤니티/스레드 요지>","channel":"community","format":"comment","mode":"help_only|disclosed","message_id":"MSG-...","status":"ready","source_url":"..."}'
+marketing-copilot queue_today --build
 ```
 - 게시 전 [[publish-policy]] 게이트: 클레임 → **표시 의무(소속·경제적 이해관계)** → 브랜드 → 플랫폼·커뮤니티 규정 → 퀄리티 바 → 승인 모드.
 - **게시 흐름 — 승인이 게이트이고, 실행은 에이전트가 한다.**
@@ -77,8 +77,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/queue_today.py" --build
 
 ## 5. 반응 기록 → 다음 행동 (VIR-15~18)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","input_mode":"manual","metrics":{"replies":0,"upvotes":0,"dm":0},"note":"게시 후 24h"}'
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
+marketing-copilot library add performance --json '{"target_kind":"content","target_id":"CON-...","message_id":"MSG-...","input_mode":"manual","metrics":{"replies":0,"upvotes":0,"dm":0},"note":"게시 후 24h"}'
+marketing-copilot library unmeasured
 ```
 - 게시 24시간·7일 후 **답글·후속 대화·DM·문의**를 기록한다(ANA-16). 성과는 댓글이 아니라 **메시지 ID에 귀속**한다(ANA-17 — [[messages]]).
 - **구매·제휴 신호가 보이면**(문의 DM·"어디서 사요"·도입 검토) 즉시 [[handoff]]로 Sales에 넘긴다(VIR-17). 이 스킬은 그 사람을 직접 영업하지 않는다.

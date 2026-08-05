@@ -13,10 +13,10 @@ description: 마케팅 지표 — 양 지표를 절대 단독으로 보지 않�
 
 ## 0. 준비 — 데이터 로드
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 200
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list performance --limit 200
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
+marketing-copilot library stats
+marketing-copilot library list content --limit 200
+marketing-copilot library list performance --limit 200
+marketing-copilot library unmeasured
 ```
 - 기본 기간은 이번 달(월간 리뷰) 또는 사용자가 지정한 기간. 주간 판정은 [[weekly-review]], 성과 원인 판독은 [[analyze]]가 본체다 — 여기서는 **추이와 타율**을 본다.
 - 커넥터(GA4·서치콘솔·광고계정·SNS 인사이트·매출)가 있으면 실측 우선, 없으면 로컬 DB의 수동 기록으로 집계한다. **분자·분모가 없으면 "집계 불가"** — 지어내지 않는다.
@@ -35,7 +35,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
 
 ## 2. 내부 1순위 KPI — 측정 커버리지 (§11)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
+marketing-copilot library unmeasured
 ```
 **게시물 중 성과가 기록되고 메시지에 귀속된 비율 = 100%에 가깝게.** 리포트 첫 줄은 항상 이 숫자다.
 - 100% 미만이면 미기록 건을 **이름까지 박아** 리포트에 넣고 [[today]] 큐의 성과 기록 슬롯으로 올린다(ANA-16). 기록 없는 활동은 학습이 안 되고, 학습 없는 활동은 반복 노동이다.
@@ -52,10 +52,10 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured
 
 ## 4. 월간 리뷰 — 마케팅비 대비 매출 (§9 매월 · 축적형)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" breakeven --margin 0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind monthly --file <파일>
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/post_slack.py" --to private --title "월간 마케팅 리뷰" --file <파일>
+marketing-copilot econ breakeven --margin 0.3
+marketing-copilot econ cac --aov 50000 --margin 0.3
+marketing-copilot save_brief --kind monthly --file <파일>
+marketing-copilot post_slack --to private --title "월간 마케팅 리뷰" --file <파일>
 ```
 - 항목: **마케팅비 대비 매출 / 채널별 수익성(실제 CAC vs 허용 CAC) / 콘텐츠 자산 성과(축적형은 4·8·12주 시점) / 소재 승자·패자 / 다음 달 예산 배분안 / 구주제 업데이트 큐 / 형제 플러그인 반영사항.**
 - **마진이 없으면 수익성 칸은 계산하지 않고 "확인 필요"로 남긴다** — 돈 계산이 빠지면 이 플러그인의 차별점이 죽는다(§13-7). [[setup]]의 미답 항목을 되묻는다.

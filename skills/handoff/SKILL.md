@@ -15,7 +15,7 @@ description: 4형제 코파일럿과 주고받는 8항목 계약서를 접수·�
 ```bash
 ls -1 "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/handoffs/inbox/" 2>/dev/null || echo "(수신함 비어 있음)"
 ls -1 "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/handoffs/outbox/" 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --status new --limit 30
+marketing-copilot library list signal --status new --limit 30
 ```
 - 수신함에 미처리 계약서가 있으면 **그게 이 세션의 최우선**이다. 세션 시작 훅이 이미 짚어 뒀다면 다시 알리지 말고 바로 접수 판정에 들어간다.
 - 회신 기한(⑧)이 지난 건이 있으면 **계약 위반 경고를 먼저 띄운다** — 새 계약서를 쓰기 전에 밀린 회신부터 닫는다.
@@ -49,8 +49,8 @@ Sales 계약서 ⑧의 기본형은 **격주 리드 목록 회신**이다. Sales
 - 회신 1건당 항목: **출처(어떤 콘텐츠·광고·커뮤니티 글)** / 연락 가능 정보 / 관심 신호(무엇을 보고 왔는가) / 온도(문의·자료요청·단순 반응) / 발생일 / 연결된 메시지 ID.
 - 근거 없는 리드를 채워 넣지 않는다 — **숫자를 맞추려고 무관한 접점을 리드로 올리면 Sales가 태워버리고 신뢰가 끝난다.** 0건이면 0건으로 회신하고 원인과 다음 행동을 함께 적는다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --status new --limit 50   # type=inbound 신호에서 회신 목록 추출
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind weekly --file <회신파일>
+marketing-copilot library list signal --status new --limit 50   # type=inbound 신호에서 회신 목록 추출
+marketing-copilot save_brief --kind weekly --file <회신파일>
 ```
 - 회신 주기는 [[routine]]에 등록해 자동으로 올라오게 한다. 미회신 건은 [[today]] 큐 상단에 계속 남는다.
 
@@ -68,8 +68,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind weekly --file <회신
 
 ## 6. 넘기는 법 — 설치돼 있으면 호출, 없으면 파일 (4형제 공통 폴백)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind weekly --file <계약서파일>
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/post_slack.py" --to team --title "핸드오프 — {주제}" --text "…" --dry-run
+marketing-copilot save_brief --kind weekly --file <계약서파일>
+marketing-copilot post_slack --to team --title "핸드오프 — {주제}" --text "…" --dry-run
 ```
 - 받는 코파일럿이 **설치돼 있으면** 해당 스킬 호출을 제안하고 계약서를 그대로 인풋으로 넘긴다(`links.*_copilot_home`으로 확인).
 - **미설치면** 파일로 저장하고 담당자에게 공유한다 [P]. 민감 정보(마진·예산 상한·개인정보)가 포함되면 `--to private` + `--sensitive`.

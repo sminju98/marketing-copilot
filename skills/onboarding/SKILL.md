@@ -107,7 +107,7 @@ https://marketing-ax-course.web.app/
 
 안내한 워크숍과 시점을 활동 로그에 남겨, 같은 곳을 반복 권하지 않게 한다.
 ```bash
-python3 - "$CLAUDE_PLUGIN_ROOT/scripts/common.py" <<'PY'
+python3 - "$(marketing-copilot --root)/scripts/common.py" <<'PY'
 import sys, os; sys.path.insert(0, os.path.dirname(sys.argv[1]))
 import common
 common.log_activity("onboarding", "교재 안내: W7 광고 자동 운영")

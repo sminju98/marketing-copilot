@@ -14,8 +14,8 @@ description: 제작 브리프(발주서) 표준 포맷 — 브랜드·상품·�
 ## 0. 준비 — 브리프의 재료는 이미 정해져 있다 (IF-01)
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims,channels,imagefactory}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status drafting --limit 10
+marketing-copilot library list message --limit 10
+marketing-copilot library list content --status drafting --limit 10
 ```
 - 브리프는 **콘텐츠 정의([[idea]]) 또는 캠페인 설계([[ads]]·[[promo]])가 끝난 뒤**에 쓴다. 정의가 없으면 브리프가 아니라 정의부터다 — 발주서에 "알아서 예쁘게"가 들어가는 순간 실패한다.
 - 브랜드 자산(로고 파일·색·폰트·기존 소재) 위치는 `context/imagefactory.md`에 등록해 두고 매번 재사용한다. 없으면 이번 브리프에서 확보해 등록한다.
@@ -44,8 +44,8 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --status drafting 
 - **성과 회수 방법**: 소재별 UTM 규칙(`utm_source`/`medium`/`campaign`/`content=소재ID`)과 전환 픽셀·이벤트. **측정 경로가 없는 소재는 발주하지 않는다.**
 - **예산 상한**: 제작비 상한 + (광고면) 테스트 예산. 손익 근거는 계산해서 붙인다:
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" cac --aov 50000 --margin 0.3
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000
+marketing-copilot econ cac --aov 50000 --margin 0.3
+marketing-copilot econ budget --cac 15000
 ```
 마진이 없으면 손익 칸은 **"확인 필요"**로 남기고 상한을 보수적으로 잡는다(method·OPP-21) — 숫자를 지어내지 않는다.
 
@@ -56,7 +56,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" budget --cac 15000
 
 ## 4. 저장·발주 (IF-09~11)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add asset --json '{"brief_id":"BRF-<날짜>-<n>","message_id":"MSG-...","type":"banner|carousel|video_cover","spec":"규격 목록","variants":0,"budget_cap":0,"status":"briefed"}'
+marketing-copilot library add asset --json '{"brief_id":"BRF-<날짜>-<n>","message_id":"MSG-...","type":"banner|carousel|video_cover","spec":"규격 목록","variants":0,"budget_cap":0,"status":"briefed"}'
 ```
 - 브리프 본문은 `~/.marketing-copilot/briefs/BRF-<날짜>-<n>.md`로 저장한다 — 파일 하나로 그대로 전달 가능해야 한다(메신저·메일·발주 폼 어디든).
 - **발주 게이트**: ① 14+4 필드 빈칸 없음 ② 저작권·사용권 확인 ③ 클레임 원장 검사 ④ 예산 상한 안 ⑤ **승인**(대외 지출 — 기본 per_item, auto여도 예외 없음, Business Copilot "발주는 DECISION" 규칙과 정합).

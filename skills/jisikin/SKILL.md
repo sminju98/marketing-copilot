@@ -19,8 +19,8 @@ description: 네이버 지식iN 침투 — 구매 직전 질문 키워드 감시
 
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list signal --limit 20
+marketing-copilot library list content --limit 20
+marketing-copilot library list signal --limit 20
 ```
 
 claims.md가 비어 있으면 [[context]]부터 한다. 답변에 쓸 수 있는 주장 원장이 없으면 초안 자체가 위험하다.
@@ -52,7 +52,7 @@ claims.md가 비어 있으면 [[context]]부터 한다. 답변에 쓸 수 있는
 지식iN 검색을 최신순으로 훑어 새 질문을 수집하고, 답변 후보는 signal로 기록한다:
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add signal --json '{"source":"jisikin","url":"...","keyword":"...","question":"...","asked_at":"..."}'
+marketing-copilot library add signal --json '{"source":"jisikin","url":"...","keyword":"...","question":"...","asked_at":"..."}'
 ```
 
 감시 주기는 [[routine]]으로 아침 큐에 편입한다. 질문은 며칠 내 답변이 몰리고 끝나므로, 감시가 늦으면 좋은 질문을 놓친다.
@@ -98,7 +98,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add signal --json '{"source":"j
 4. 게시 직후 content로 기록:
 
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"jisikin","url":"...","message_id":"...","mode":"소속밝힘","posted_at":"..."}'
+marketing-copilot library add content --json '{"channel":"jisikin","url":"...","message_id":"...","mode":"소속밝힘","posted_at":"..."}'
 ```
 
 승인은 건별이다. "앞으로 다 올려도 돼" 같은 포괄 승인으로 건너뛰지 않는다.

@@ -13,8 +13,8 @@ description: 오늘의 마케팅 큐 — 오늘 게시할 가치가 있는 것, 
 
 ## 0. 준비 — DB 로드·큐 자동 생성
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" stats
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/queue_today.py" --build
+marketing-copilot library stats
+marketing-copilot queue_today --build
 ```
 - **오늘 큐는 보통 세션 시작 훅이 이미 만들어 뒀다** — 있으면 다시 만들지 말고 바로 소진에 들어간다. 없을 때만 `--build`로 즉시 생성해 통보한다(만들지 물어보지 않는다).
 - `stats`의 **측정 커버리지**를 먼저 본다 — 게시물 중 성과가 기록된 비율이 내부 1순위 KPI(§11)다. 100% 미만이면 그 차이가 오늘 큐의 고정 항목이다.
@@ -22,9 +22,9 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/queue_today.py" --build
 
 ## 1. 큐를 채우는 6개 통로 (§9 아침 큐)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" expiring --days 3    # 유효기간 임박 신호·기회
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" unmeasured           # 성과 미기록 게시물
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" fatigue              # 피로도 임박 소재
+marketing-copilot library expiring --days 3    # 유효기간 임박 신호·기회
+marketing-copilot library unmeasured           # 성과 미기록 게시물
+marketing-copilot library fatigue              # 피로도 임박 소재
 ```
 1. **유효기간 임박 신호·기회**(SIG-15·OPP-19) — 오늘 안 쓰면 죽는 것. → [[signals]]·[[opportunity]]
 2. **오늘 게시 가치가 있는 콘텐츠**(CON-11) — **퀄리티 바 5항목 통과분만.** 미달은 게시가 아니라 보강 큐로.
@@ -59,9 +59,9 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" fatigue              # 피로�
 
 ## 6. 마감·이월
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/queue_today.py"
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/save_brief.py" --kind morning --file <파일>
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/post_slack.py" --to private --title "오늘의 마케팅 큐" --text "..." --dry-run
+marketing-copilot queue_today
+marketing-copilot save_brief --kind morning --file <파일>
+marketing-copilot post_slack --to private --title "오늘의 마케팅 큐" --text "..." --dry-run
 ```
 - 마감은 4줄로: **오늘 게시한 것 / 성과 기록 안 된 것 / 미처리 승인 / 내일 최우선.** 미완료는 삭제하지 않고 내일 큐 최상단으로 이월한다.
 - 매일 자동 실행 등록은 [[routine]](`schedule_brief.py --kind morning`), 주간 판정은 [[weekly-review]], 행동량·타율 지표는 [[metrics]].

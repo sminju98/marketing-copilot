@@ -13,7 +13,7 @@ description: 게시정책·브랜드 세이프티 엔진 — 게시 전 6단계 
 
 ## 0. 준비 — 정책 장부를 점검한다 (원장 없으면 게시 없음)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/doctor.py"
+marketing-copilot doctor
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/claims.md" 2>/dev/null || echo "(클레임 원장 없음 — context 먼저)"
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/tone.md" 2>/dev/null
 ```
@@ -22,7 +22,7 @@ cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/tone.md" 2>/dev/null
 ### 0-1. ★하드 게이트 — 판단이 아니라 코드가 센다 (자동 게시 전 필수)
 게이트 1~6은 모델이 읽고 판정하는 검사다. **양식 동일성·발송량·시간대·예산 상한은 모델의 판단에 맡기지 않고 `gates.py`가 파일 상태로 센다.** exit code 2면 그 자리에서 중단하고 승인 큐로 올린다 — 우회 금지.
 ```bash
-G="$CLAUDE_PLUGIN_ROOT/scripts/gates.py"
+G="$(marketing-copilot --root)/scripts/gates.py"
 python3 "$G" status                                              # 한도 설정 확인
 python3 "$G" template check --id <양식ID> --file <원고파일>        # 승인본과 해시 대조
 ```
@@ -77,7 +77,7 @@ python3 "$G" template check --id <양식ID> --file <원고파일>        # 승�
 
 ## 6. 게이트 6 — 승인 모드 적용 + 측정 슬롯 (§6-J-6, 철학 6)
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <id> --json '{"gate":"passed","disclosure_mode":"2","message_id":"MSG-...","utm":"utm_source=...&utm_medium=...&utm_campaign=..."}'
+marketing-copilot library update content <id> --json '{"gate":"passed","disclosure_mode":"2","message_id":"MSG-...","utm":"utm_source=...&utm_medium=...&utm_campaign=..."}'
 ```
 - `auto`만 허용범위 내 자동 진행. `batch`/`per_item`은 승인 대기, **`draft_only`·미설정이면 초안까지만.** 타부서·대행사·신입은 모드와 무관하게 [P]/[E]로 강등([[role]]).
 - **측정 슬롯 없는 게시는 통과시키지 않는다**: 링크에 UTM, 레코드에 `message_id`와 성과 기록 슬롯. 커넥터가 없으면 게시 24시간·7일 후 수동 기록을 큐에 예약한다(ANA-16).
@@ -86,7 +86,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <id> --json '{"g
 ## 7. 판정 결과는 넷 중 하나 — 손 놓는 판정은 없다
 ① **그대로 게시** ② **고쳐서 게시**(수정본까지 만들어 돌려준다) ③ **보강 큐**(무엇을 보강할지 1~2줄로 지정) ④ **게시 안 함**(사유 + 대안 경로: 모드 전환·채널 전환·주제 전환 VIR-18).
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" update content <id> --json '{"status":"needs_work","gate_fail":"퀄리티 바 ①고유성","next_action":"자사 측정 사례 1건 삽입"}'
+marketing-copilot library update content <id> --json '{"status":"needs_work","gate_fail":"퀄리티 바 ①고유성","next_action":"자사 측정 사례 1건 삽입"}'
 ```
 
 ## 출력 (게이트 판정)

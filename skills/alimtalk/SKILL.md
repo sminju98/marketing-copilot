@@ -18,8 +18,8 @@ B2C 온라인에서 알림톡은 **도달률이 가장 높은 채널**이다. �
 ## 0. 준비
 ```bash
 cat "${MKT_COPILOT_HOME:-$HOME/.marketing-copilot}/context/"{brand,products,audiences,tone,claims,channels}.md 2>/dev/null
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list message --limit 10
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" list content --limit 20   # channel=alimtalk 레코드를 골라 본다
+marketing-copilot library list message --limit 10
+marketing-copilot library list content --limit 20   # channel=alimtalk 레코드를 골라 본다
 ```
 - `channels.md`에 **카카오 채널 개설 여부·발신프로필 등록 여부·발송사**가 없으면 [[context]]로 먼저 등록한다.
 - 발송 이력을 먼저 본다 — **같은 고객에게 이번 달 몇 번 보냈는지**가 다음 판단의 전제다. 빈도가 피로도를 만든다.
@@ -108,7 +108,7 @@ A/S 접수·완료           회원가입·본인 인증
 
 **단가 계산은 econ으로 붙인다** — 발송 1건당 6.5~8원이므로, 재구매 1건의 공헌이익이 발송 비용의 몇 배인지 먼저 계산한다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/econ.py" --help
+marketing-copilot econ --help
 ```
 - 예: 공헌이익 10,000원 / 발송 단가 6.5원이면 **1,538건 보내서 1건만 사도 본전**이다. 이 구조가 알림톡이 리텐션 주력인 이유다.
 - 다만 **피로도는 돈으로 안 잡힌다** — 차단·수신거부는 영구 손실이다. 빈도 상한을 먼저 정한다(ALT-11).
@@ -257,7 +257,7 @@ D+7  후기 요청       [대가 걸면 광고성]
 - **무인 실행 환경에서도 광고성 발송은 자동 집행하지 않는다** — 동의 근거 확인은 사람의 판단이다.
 - 발송 결과(성공·실패·차단)를 라이브러리에 기록한다.
 ```bash
-python3 "$CLAUDE_PLUGIN_ROOT/scripts/library.py" add content --json '{"channel":"alimtalk","status":"published","title":"...","message_id":"MSG-..."}'
+marketing-copilot library add content --json '{"channel":"alimtalk","status":"published","title":"...","message_id":"MSG-..."}'
 ```
 
 ---
