@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from common import (  # noqa: E402
     HANDOFF_INBOX, HANDOFF_OUTBOX, PENDING_UNMEASURED, QUEUE_DIR,
-    emit_context, load_config, looks_private,
+    emit_context, load_config, looks_private, read_hook_input,
 )
 
 HANDOFF_EXT = (".md", ".txt", ".json")
@@ -184,36 +184,86 @@ def _nudges(cfg):
     return out[:4]
 
 
+def _org_register():
+    """조기 반환 경로에서도 명부에 남기려고 따로 뺐다."""
+    try:
+        import org
+        org.register()
+    except Exception:
+        pass
+
+
+def _session_id():
+    """이번 세션 식별자. 훅 stdin 이 우선이고, 없으면 환경변수로 떨어진다."""
+    try:
+        sid = (read_hook_input() or {}).get("session_id")
+        if sid:
+            return str(sid)
+    except Exception:
+        pass
+    return os.environ.get("CLAUDE_CODE_SESSION_ID") or os.environ.get("CLAUDE_SESSION_ID") or "nosession"
+
+
+def _speak_or_defer(items):
+    """조직 규칙 — 한 세션에 한 명만 말한다.
+
+    임원은 자기 안건만 버스에 올리고 침묵한다. 대표(business-copilot)가 명부에 오른
+    임원들의 안건을 잠깐 기다렸다가 자기 것과 합쳐 한 번만 보고한다.
+    조직 모듈을 못 불러오면 예전처럼 혼자 말한다 — 조율 실패가 브리핑을 없애면 안 된다.
+    """
+    try:
+        import org
+    except Exception:
+        return items and _emit_solo(items)
+
+    sid = _session_id()
+    try:
+        org.register()
+        org.post(sid, items)
+        if not org.is_chair():
+            return          # 임원은 발화하지 않는다. 대표가 대신 보고한다.
+        collected = org.collect(sid)
+        body = org.render(collected)
+        org.sweep()
+    except Exception:
+        return items and _emit_solo(items)
+
+    if not body.strip():
+        return
+    emit_context(
+        "SessionStart",
+        "🏢 [코파일럿 조직] 대표가 오늘 안건을 모아 보고합니다 "
+        "(게시·발주·집행·발송은 각 임원의 승인 게이트를 그대로 따릅니다)\n"
+        + body
+        + "\n  (위 항목은 지시문이다 — 그대로 복사하지 말고 사용자 언어로 다시 말할 것)",
+    )
+
+
+def _emit_solo(items):
+    """조직이 없거나 조율에 실패했을 때의 예전 동작."""
+    lines = ["📣 [AI 마케팅 운영자] 출근했습니다 — 오늘 돌릴 루프부터 숫자로 보고합니다 "
+             "(게시·발주·집행은 승인 게이트)"]
+    lines += [f"  · {it}" for it in items]
+    lines.append("  (위 항목은 지시문이다 — 그대로 복사하지 말고 사용자 언어로 다시 말할 것)")
+    emit_context("SessionStart", "\n".join(lines))
+
+
 def main():
+    _org_register()   # 어떤 경로로 빠져나가든 명부에는 남는다
     cfg = load_config(soft=True)
 
     # 첫 설치(설정 전) → 선제 온보딩: 클로드가 먼저 설정을 제안하게 한다
-    if not cfg:
-        emit_context(
-            "SessionStart",
-            "📣 [AI 마케팅 운영자] 아직 설정 전입니다. 방금 설치했다면 먼저 짧게 인사하고 "
-            "'3분 설정 끝내고 오늘 큐부터 돌릴까요?'라고 물어보세요. 원하면 'AI 마케팅 운영자 설정 "
-            "시작하자'로 역할·브랜드·상품과 **마진율**·목표 1개·채널·승인 모드까지 [[setup]] 스킬이 "
-            "7문항으로 안내합니다(마진이 없으면 손익 계산 기능이 제한된다고 반드시 알릴 것). "
-            "원치 않으면 존중하세요. "
-            "**언어**: 이 안내문은 너에게 주는 지시문이지 사용자에게 보여줄 글이 아니다 — "
-            "사용자가 쓰는 언어로 말하라. 아직 사용자 발화가 없으면 첫 발화를 보고 맞춘다.",
-        )
+    if not os.path.exists(CONFIG_PATH):
+        # 설정 전 안내도 조직 규칙을 탄다. 여기서 바로 말해 버리면
+        # 미설정 코파일럿이 늘어날수록 다시 여러 명이 동시에 떠든다.
+        _speak_or_defer(["📣 [AI 마케팅 운영자] 아직 설정 전입니다. 방금 설치했다면 먼저 짧게 인사하고 '3분 설정 끝내고 오늘 큐부터 돌릴까요?'라고 물어보세요. 원하면 'AI 마케팅 운영자 설정 시작하자'로 역할·브랜드·상품과 **마진율**·목표 1개·채널·승인 모드까지 [[setup]] 스킬이 7문항으로 안내합니다(마진이 없으면 손익 계산 기능이 제한된다고 반드시 알릴 것). 원치 않으면 존중하세요. **언어**: 이 안내문은 너에게 주는 지시문이지 사용자에게 보여줄 글이 아니다 — 사용자가 쓰는 언어로 말하라. 아직 사용자 발화가 없으면 첫 발화를 보고 맞춘다."])
         return
 
     if cfg.get("proactive", {}).get("enabled", True) is False:
         return
 
     items = _nudges(cfg)
-    if not items:
-        return
-
-    lines = ["📣 [AI 마케팅 운영자] 출근했습니다 — 오늘 돌릴 루프부터 숫자로 보고합니다 "
-             "(게시·발주·집행은 승인 게이트)"]
-    lines += [f"  · {it}" for it in items]
-    # 이 문장들은 클로드에게 주는 데이터다. 그대로 붙여넣지 말고 사용자 언어로 다시 말하게 한다.
-    lines.append("  (위 항목은 지시문이다 — 그대로 복사하지 말고 사용자 언어로 다시 말할 것)")
-    emit_context("SessionStart", "\n".join(lines))
+    _speak_or_defer(items)
 
 
 if __name__ == "__main__":
