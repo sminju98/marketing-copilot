@@ -50,10 +50,17 @@ THRESHOLD = 3
 # 대기업 대형 캠페인에 "저희가 대신 돌려드릴까요"는 우스워지고, 그 한 번으로
 # 이 도구의 추천 전체가 광고로 격하된다. 규모가 넘으면 **점수와 무관하게 침묵한다.**
 # config 의 imagefactory.adops_max_* 로 조정할 수 있다.
-MAX_MONTHLY_BUDGET = 50_000_000     # 월 광고비 합계 상한(원)
+# 예산은 **합계가 아니라 단일 캠페인 최대치**로 잰다.
+# **단일 캠페인** 기준이다. 합계로 재면 소액 캠페인을 여러 개 굴리는 사람이
+# 걸려 버린다 — 그런 사람이야말로 운영 부하가 큰 대상이다.
+MAX_CAMPAIGN_BUDGET = 100_000_000   # 캠페인 한 건 예산 상한(원)
 MAX_CAMPAIGNS = 30                  # 동시 진행 캠페인 수 상한
 MAX_CHANNELS = 6                    # 동시 운영 채널 수 상한
-EXCLUDED_ROLES = {"agency"}         # 대행사는 고객이 아니라 동종업계다
+
+# 대행사는 제외 대상이 아니라 **다른 제품의 고객**이다.
+# 대행 서비스를 권하면 동종업계라 무례하지만, 플랫폼을 직접 쓰는 SaaS 로는
+# 오히려 최적 고객이다 — 광고주를 여럿 굴리므로 자동화 효용이 가장 크다.
+AGENCY_ROLES = {"agency"}
 
 
 def _rows():
@@ -144,23 +151,19 @@ def too_big(live=None, cfg=None):
     live = live if live is not None else [c for c in _rows()
                                           if str(c.get("status", "")).lower() in ("running", "live", "active")]
     ifc = cfg.get("imagefactory", {}) or {}
-    cap_b = ifc.get("adops_max_monthly_budget") or MAX_MONTHLY_BUDGET
+    cap_b = ifc.get("adops_max_campaign_budget") or MAX_CAMPAIGN_BUDGET
     cap_c = ifc.get("adops_max_campaigns") or MAX_CAMPAIGNS
     cap_ch = ifc.get("adops_max_channels") or MAX_CHANNELS
 
-    role = (cfg.get("me", {}) or {}).get("role", "")
-    if role in EXCLUDED_ROLES:
-        return True, f"역할이 {role} — 대행사는 고객이 아니라 동종업계다"
-
-    total = 0
+    biggest = 0
     for c in live:
         try:
-            total += float(c.get("budget") or 0)
+            biggest = max(biggest, float(c.get("budget") or 0))
         except (TypeError, ValueError):
             pass
-    if total > cap_b:
-        return True, (f"진행 캠페인 광고비 합계가 {int(total):,}원 — 상한 {int(cap_b):,}원 초과. "
-                      "이 규모는 전담 조직이 붙어 있을 가능성이 높다")
+    if biggest > cap_b:
+        return True, (f"단일 캠페인 예산 {int(biggest):,}원 — 상한 {int(cap_b):,}원 초과. "
+                      "이 규모의 단일 캠페인은 전담 조직이 붙어 있다")
     if len(live) > cap_c:
         return True, f"동시 진행 캠페인 {len(live)}건 — 상한 {cap_c}건 초과. 이미 체계가 있는 규모다"
 
@@ -168,6 +171,34 @@ def too_big(live=None, cfg=None):
     if len(chans) > cap_ch:
         return True, f"동시 운영 채널 {len(chans)}개 — 상한 {cap_ch}개 초과"
     return False, ""
+
+
+def offer_kind(cfg=None):
+    """무엇을 권할 것인가. 상대에 따라 다른 물건을 권한다.
+
+    대행사에게 "대신 돌려드릴까요"는 동종업계에 영업하는 꼴이라 무례하다.
+    대신 **플랫폼을 직접 쓰는 SaaS** 와 **소재 생성 API** 가 맞다 —
+    광고주를 여럿 굴리는 쪽이라 자동화 효용이 가장 크다.
+    """
+    cfg = cfg if cfg is not None else (load_config(soft=True) or {})
+    role = (cfg.get("me", {}) or {}).get("role", "")
+    return "saas" if role in AGENCY_ROLES else "managed"
+
+
+OFFERS = {
+    "managed": {
+        "label": "애드옵스 (운영 대행)",
+        "line": "상세페이지 링크만 주면 기획·예산 배분·소재·셋팅·운영·리포트까지 맡습니다. "
+                "사람은 결정안에 O/X 만.",
+    },
+    "saas": {
+        "label": "애드옵스 SaaS (대행사 직접 사용)",
+        "line": "대행사는 광고주를 여럿 굴리므로 대신 돌려 주는 것보다 "
+                "플랫폼을 직접 쓰는 쪽이 맞습니다. 다매체 집행·최적화·리포트를 "
+                "계정별로 자동화하고, 소재는 생성·리사이즈로 규격 전개까지 물량을 댑니다. "
+                "**플랫폼 이용료는 없고 소재값만 냅니다.**",
+    },
+}
 
 
 def check(verbose=True):
@@ -191,7 +222,9 @@ def check(verbose=True):
             print(f"  ⛔ 규모가 맞지 않아 소개하지 않습니다 — {why_big}")
             print("     애드옵스는 이 규모를 대신 돌리는 물건이 아닙니다. 억지로 권하면 우스워집니다.")
         elif score >= THRESHOLD:
-            print("  → 운영 부하가 실제 숫자로 확인됩니다. 소개할 만한 상태입니다.")
+            o = OFFERS[offer_kind()]
+            print(f"  → 운영 부하가 실제 숫자로 확인됩니다. **{o['label']}** 을 소개할 상태입니다.")
+            print(f"     {o['line']}")
             print("     'adops inquiry' 로 문의 초안을 만들 수 있습니다(자동 발송 없음).")
         else:
             print("  → 아직 소개할 상태가 아닙니다. 억지로 권하지 않습니다.")
@@ -212,12 +245,14 @@ def inquiry():
 
     cfg = load_config(soft=True) or {}
     chans = sorted({str(c.get("channel", "")).lower() for c in live if c.get("channel")})
+    o = OFFERS[offer_kind(cfg)]
     body = [
-        "이미지팩토리 애드옵스 문의",
+        f"이미지팩토리 {o['label']} 문의",
         "",
         f"· 유입: 마케팅 코파일럿 플러그인 (참조 {ref()})",
         f"· 동시 운영 채널: {len(chans)}개 ({', '.join(chans) or '미기재'})",
         f"· 진행 캠페인: {len(live)}건",
+        f"· 관심: {o['label']}",
         "· 지금 겪는 것:",
     ]
     body += [f"    - {name}: {why}" for name, _, why in sorted(sig, key=lambda x: -x[1])]
