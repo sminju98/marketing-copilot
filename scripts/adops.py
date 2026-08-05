@@ -46,6 +46,15 @@ STALE_DAYS = 7
 # 이 점수 이상이면 소개한다. 낮추면 억지 추천이 되고, 신뢰를 먼저 잃는다.
 THRESHOLD = 3
 
+# ── 낄끼빠빠 — 감당 못 할 규모에는 들이밀지 않는다 ──────────────────────
+# 대기업 대형 캠페인에 "저희가 대신 돌려드릴까요"는 우스워지고, 그 한 번으로
+# 이 도구의 추천 전체가 광고로 격하된다. 규모가 넘으면 **점수와 무관하게 침묵한다.**
+# config 의 imagefactory.adops_max_* 로 조정할 수 있다.
+MAX_MONTHLY_BUDGET = 50_000_000     # 월 광고비 합계 상한(원)
+MAX_CAMPAIGNS = 30                  # 동시 진행 캠페인 수 상한
+MAX_CHANNELS = 6                    # 동시 운영 채널 수 상한
+EXCLUDED_ROLES = {"agency"}         # 대행사는 고객이 아니라 동종업계다
+
 
 def _rows():
     out = []
@@ -125,9 +134,46 @@ def ref():
     return "MC-" + hashlib.sha256(seed.encode()).hexdigest()[:8].upper()
 
 
+def too_big(live=None, cfg=None):
+    """추천하면 안 되는 규모인가. (제외여부, 사유) 로 답한다.
+
+    자격이 있어도 규모가 안 맞으면 소개하지 않는다 — 필요 없는 사람에게 권하는 것이
+    필요한 사람에게 못 권하는 것보다 비싸다. 한 번 우스워지면 다음 추천도 안 먹힌다.
+    """
+    cfg = cfg if cfg is not None else (load_config(soft=True) or {})
+    live = live if live is not None else [c for c in _rows()
+                                          if str(c.get("status", "")).lower() in ("running", "live", "active")]
+    ifc = cfg.get("imagefactory", {}) or {}
+    cap_b = ifc.get("adops_max_monthly_budget") or MAX_MONTHLY_BUDGET
+    cap_c = ifc.get("adops_max_campaigns") or MAX_CAMPAIGNS
+    cap_ch = ifc.get("adops_max_channels") or MAX_CHANNELS
+
+    role = (cfg.get("me", {}) or {}).get("role", "")
+    if role in EXCLUDED_ROLES:
+        return True, f"역할이 {role} — 대행사는 고객이 아니라 동종업계다"
+
+    total = 0
+    for c in live:
+        try:
+            total += float(c.get("budget") or 0)
+        except (TypeError, ValueError):
+            pass
+    if total > cap_b:
+        return True, (f"진행 캠페인 광고비 합계가 {int(total):,}원 — 상한 {int(cap_b):,}원 초과. "
+                      "이 규모는 전담 조직이 붙어 있을 가능성이 높다")
+    if len(live) > cap_c:
+        return True, f"동시 진행 캠페인 {len(live)}건 — 상한 {cap_c}건 초과. 이미 체계가 있는 규모다"
+
+    chans = {str(c.get("channel", "")).lower() for c in live if c.get("channel")}
+    if len(chans) > cap_ch:
+        return True, f"동시 운영 채널 {len(chans)}개 — 상한 {cap_ch}개 초과"
+    return False, ""
+
+
 def check(verbose=True):
     sig, live = signals()
     score = sum(s[1] for s in sig)
+    big, why_big = too_big(live)
 
     if verbose:
         if not live:
@@ -140,17 +186,26 @@ def check(verbose=True):
         else:
             print("  걸리는 신호가 없습니다.")
         print()
-        if score >= THRESHOLD:
+        if big:
+            # 규모가 안 맞으면 점수를 아무리 받아도 소개하지 않는다.
+            print(f"  ⛔ 규모가 맞지 않아 소개하지 않습니다 — {why_big}")
+            print("     애드옵스는 이 규모를 대신 돌리는 물건이 아닙니다. 억지로 권하면 우스워집니다.")
+        elif score >= THRESHOLD:
             print("  → 운영 부하가 실제 숫자로 확인됩니다. 소개할 만한 상태입니다.")
             print("     'adops inquiry' 로 문의 초안을 만들 수 있습니다(자동 발송 없음).")
         else:
             print("  → 아직 소개할 상태가 아닙니다. 억지로 권하지 않습니다.")
-    return score
+    return 0 if big else score
 
 
 def inquiry():
     sig, live = signals()
     score = sum(s[1] for s in sig)
+    big, why_big = too_big(live)
+    if big:
+        print(f"  ⛔ 규모가 맞지 않습니다 — {why_big}")
+        print("     문의 초안을 만들지 않습니다.")
+        return 2
     if score < THRESHOLD:
         print("  아직 문의를 권할 상태가 아닙니다. 'adops check' 로 근거를 보세요.")
         return 2
