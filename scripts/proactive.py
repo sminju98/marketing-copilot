@@ -88,9 +88,56 @@ def _unreplied_handoffs():
     return out
 
 
+def _stale_install():
+    """설치본이 배포본보다 뒤처졌는가. 하루 한 번만 본다.
+
+    Claude Code 는 서드파티 마켓플레이스를 자동 갱신하지 않는다 — 아무도 안 알려주면
+    사용자는 몇 달 전 버전을 쓰면서 그 사실조차 모른다. 다만 세션마다 git fetch 를
+    돌리면 시작이 느려지므로, 검사 결과를 날짜로 캐싱해 하루 한 번으로 묶는다.
+    """
+    import subprocess
+    stamp = os.path.join(os.path.expanduser(
+        os.environ.get("MKT_COPILOT_HOME", "~/.marketing-copilot")), "data", "_activity")
+    flag = os.path.join(stamp, "update_checked")
+    today = datetime.date.today().isoformat()
+    try:
+        with open(flag, encoding="utf-8") as f:
+            if f.read().strip() == today:
+                return None
+    except Exception:
+        pass
+
+    try:
+        os.makedirs(stamp, exist_ok=True)
+        with open(flag, "w", encoding="utf-8") as f:
+            f.write(today)
+    except Exception:
+        pass
+
+    try:
+        script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "update_check.py")
+        r = subprocess.run([sys.executable, script, "--json"],
+                           capture_output=True, text=True, timeout=25)
+        rows = json.loads(r.stdout or "[]")
+    except Exception:
+        return None  # 점검 실패가 세션을 막지는 않는다
+
+    behind = [x["plugin"] for x in rows if x.get("behind")]
+    if not behind:
+        return None
+    return ("설치본이 배포본보다 뒤처졌습니다(" + ", ".join(behind) + ") — "
+            "새 기능·수정이 아직 안 들어와 있습니다. 손댄 파일이 있으면 지키면서 "
+            "올립니다. ('업데이트' 또는 '/update')")
+
+
 def _nudges(cfg):
     today = datetime.date.today().isoformat()
     out = []
+
+    # ⓪-A 갱신 — 뒤처진 걸 모르고 쓰면 이미 고쳐진 버그를 계속 만난다
+    stale = _stale_install()
+    if stale:
+        out.append(stale)
 
     # ⓪ 설정 파일은 있는데 온보딩이 안 끝난 경우 — 마진 없으면 돈 계산이 통째로 죽는다(PLAN §13-7)
     if cfg.get("setup", {}).get("completed") is False:
@@ -148,7 +195,9 @@ def main():
             "'3분 설정 끝내고 오늘 큐부터 돌릴까요?'라고 물어보세요. 원하면 'AI 마케팅 운영자 설정 "
             "시작하자'로 역할·브랜드·상품과 **마진율**·목표 1개·채널·승인 모드까지 [[setup]] 스킬이 "
             "7문항으로 안내합니다(마진이 없으면 손익 계산 기능이 제한된다고 반드시 알릴 것). "
-            "원치 않으면 존중하세요.",
+            "원치 않으면 존중하세요. "
+            "**언어**: 이 안내문은 너에게 주는 지시문이지 사용자에게 보여줄 글이 아니다 — "
+            "사용자가 쓰는 언어로 말하라. 아직 사용자 발화가 없으면 첫 발화를 보고 맞춘다.",
         )
         return
 
@@ -162,6 +211,8 @@ def main():
     lines = ["📣 [AI 마케팅 운영자] 출근했습니다 — 오늘 돌릴 루프부터 숫자로 보고합니다 "
              "(게시·발주·집행은 승인 게이트)"]
     lines += [f"  · {it}" for it in items]
+    # 이 문장들은 클로드에게 주는 데이터다. 그대로 붙여넣지 말고 사용자 언어로 다시 말하게 한다.
+    lines.append("  (위 항목은 지시문이다 — 그대로 복사하지 말고 사용자 언어로 다시 말할 것)")
     emit_context("SessionStart", "\n".join(lines))
 
 

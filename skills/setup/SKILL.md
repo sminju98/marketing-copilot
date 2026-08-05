@@ -121,6 +121,28 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.routine_enabled=true
 - 스케줄 도구(scheduled-tasks·클라우드 루틴·`/schedule`)가 있으면 그 도구로 즉시 등록하고, 없으면 크론식+프롬프트 레시피를 제시한다. 크론식은 config `brief.morning_schedule`(기본 `0 9 * * 1-5`)·`weekly_schedule`(`0 10 * * 1`)·`monthly_schedule`(`0 10 1 * *`). 등록·수정·해제 본체는 [[routine]].
 - **무인 실행은 한계 통치를 따른다** — auto 모드에서 승인 양식·게이트·한도 안의 발송·게시는 공식 경로로 자동 실행(전건 로그), 한계 밖과 발주·집행 개시·증액은 승인 대기. draft_only가 안전 기본값이며 한계 설정을 마쳐야 auto로 전환한다.
 
+### 9-1. [A] 자동 갱신도 같이 건다 — 지금 안 걸면 아무도 안 건다
+Claude Code는 **공식 마켓플레이스만** 자동 갱신을 기본으로 켠다. 이 플러그인은 서드파티라 **기본이 꺼짐**이다. 그래서 여기서 걸어 두지 않으면 사용자는 몇 달 전 버전을 쓰면서 그 사실조차 모른다 — "이 기능이 왜 없지"의 상당수가 실은 갱신 문제다.
+```bash
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/update_check.py" --install-cron
+```
+매주 월요일 09:30 점검·갱신이 걸린다. **사용자가 손댄 파일은 자동으로 지켜진다**(overrides 재적용). 본체는 [[update]].
+
+그리고 Claude Code 자체 자동 갱신도 함께 안내한다 — 이건 대화형 패널이라 **대신 눌러 줄 수 없으니** 이 세 줄을 그대로 전달한다:
+```
+/plugin → Marketplaces 탭 → marketing-copilot 선택 → Enable auto-update
+```
+- 둘은 겹치지 않는다. Claude Code 쪽이 빠르고(세션 시작 후 백그라운드), 크론 쪽은 **내 수정본을 지켜 준다.** 둘 다 걸어도 된다.
+- `--install-cron`이 실패하면(크론 권한 없음·컨테이너 등) 실패했다고 알리고 `/plugin` 경로만 남긴다. 조용히 넘어가지 않는다.
+
+### 9-2. [A] 언어 — 묻지 말고 감지한다
+사용자가 쓰는 언어를 그대로 따르면 되므로 **질문을 늘리지 않는다.** 기본값 `auto` 그대로 두고, 사용자가 "영어로 써줘" 같은 요청을 하거나 팀 공용 산출물의 언어를 못 박아야 할 때만 값을 넣는다.
+```bash
+python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" language=auto   # en·ja·zh 등으로 고정 가능
+```
+- **대화 언어와 산출물 언어는 다르다.** 영어로 대화해도 한국 시장에 낼 블로그 글은 한국어로 쓴다. 어느 시장에 낼 것인지가 기준이다.
+- 한국 플랫폼 전용 스킬([[local]]·[[cafe]]·[[jisikin]]·[[alimtalk]])은 다른 시장 사용자에게 권하지 않는다. 자세히 [[method]] 00절.
+
 ## 10. 마무리 — 검증 후 완료 처리
 ```bash
 python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" setup.completed=true
