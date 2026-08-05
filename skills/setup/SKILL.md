@@ -40,7 +40,8 @@ marketing-copilot set_config me.name="홍길동" me.role="marketer" me.title="�
 뭘 파는가, 대표 상품 1~3개, **객단가와 대략의 마진율**. 마진율은 "원가 빼고 대략 몇 % 남나요"로 쉽게 묻는다(0~1로 저장 — 30%면 0.3).
 ```bash
 marketing-copilot set_config brand.name="우리 브랜드" brand.one_liner="무엇을, 누구에게, 왜 좋은지 한 줄" economics.aov=50000 economics.margin_rate=0.3
-marketing-copilot econ breakeven --margin 0.3   # 바로 보여준다: "ROAS 3.33 이하는 적자입니다"
+marketing-copilot econ breakeven --margin 0.3
+marketing-copilot set_config brand.industry="ecommerce-fashion"   # 벤치마크 비교 기준(선택). 목록은 bench.py 참고   # 바로 보여준다: "ROAS 3.33 이하는 적자입니다"
 ```
 - `set_config.py`는 점(.) 중첩 **딕셔너리** 경로만 쓴다 — 상품이 여러 개면 대표값만 `economics.*`에 넣고, **상품별 가격·마진·경쟁재는 [[context]]가 `context/products.md`에 기록**한다(config `offerings` 목록은 예시 파일 구조를 그대로 두거나 [[context]]가 채운다).
 - **"나중에"는 허용하되 반드시 결과를 알린다**: "마진 없으면 손익분기 ROAS·허용 CAC·최소 테스트 예산이 계산되지 않아 기회 제안과 광고 판정이 전부 '확인 필요'로 나갑니다." 미입력 상태는 `doctor.py`가 계속 짚고, [[opportunity]]·[[ads]]가 매번 되묻는다.

@@ -27,6 +27,7 @@
   "language": "auto",
   "brand": {
     "name": "우리 브랜드",
+    "industry": "",
     "one_liner": "무엇을, 누구에게, 왜 좋은지 한 줄",
     "primary_goal": "revenue",
     "goal_note": "revenue | leads | signup | awareness | launch | retention 중 하나만 — 우선순위를 강제한다"
