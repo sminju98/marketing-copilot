@@ -11,6 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common  # noqa: E402
+import authority_guard  # noqa: E402
 
 # (트리거 키워드들, 주입할 마케팅 운영자 한마디)
 SITUATIONS = [
@@ -101,23 +102,35 @@ def _throttle(session, key):
 
 
 def main():
-    p = common.proactive_cfg()
-    if p is None or p.get("prompt_nudge", True) is False:
-        return
     data = common.read_hook_input()
-    prompt = (data.get("prompt") or "").lower()
+    prompt = data.get("prompt") or ""
     session = data.get("session_id") or "-"
     if not prompt:
         return
 
-    notes = []
+    # 매 요청마다 범위를 덮어써 이전 마케팅 요청이 다음 무관 과업으로 새지 않게 한다.
+    scope = authority_guard.classify(prompt)
+    authority_guard.save_state(session, scope)
+    if not scope.get("active"):
+        return
+
+    notes = [authority_guard.authority_context(scope)]
+    # 고객용 산출물은 운영 진단·게이트 넛지를 주입하지 않는다. 준비도는 실제 집행 때만 본다.
+    if scope.get("artifact_only"):
+        common.emit_context("UserPromptSubmit", "\n\n".join(notes))
+        return
+
+    p = common.proactive_cfg()
+    if p is None or p.get("prompt_nudge", True) is False:
+        common.emit_context("UserPromptSubmit", "\n\n".join(notes))
+        return
+
+    lower_prompt = prompt.lower()
     for i, (keys, msg) in enumerate(SITUATIONS):
-        if any(k in prompt for k in keys) and not _throttle(session, i):
+        if any(k in lower_prompt for k in keys) and not _throttle(session, i):
             notes.append(msg)
 
-    if not notes:
-        return
-    common.emit_context("UserPromptSubmit", "\n".join(notes[:3]))
+    common.emit_context("UserPromptSubmit", "\n\n".join(notes[:4]))
 
 
 if __name__ == "__main__":
