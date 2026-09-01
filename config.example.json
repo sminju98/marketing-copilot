@@ -7,7 +7,7 @@
       "content",
       "social"
     ],
-    "approval_mode": "per_item",
+    "approval_mode": "draft_only",
     "publish_scope": [
       "plan_content",
       "draft_content",
@@ -134,10 +134,10 @@
     "routine_enabled": false
   },
   "proactive": {
-    "enabled": true,
-    "prompt_nudge": true,
-    "review_on_save": true,
-    "end_check": true
+    "enabled": false,
+    "prompt_nudge": false,
+    "review_on_save": false,
+    "end_check": false
   },
   "links": {
     "business_copilot_home": "~/.business-copilot",

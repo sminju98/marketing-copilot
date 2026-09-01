@@ -73,7 +73,7 @@ marketing-copilot library add asset --json '{"brief_id":"BRF-...","type":"carous
 marketing-copilot library update content <CON-ID> --json '{"status":"ready","publish_date":"YYYY-MM-DD","utm":"utm_source=instagram&utm_medium=organic&utm_campaign=..."}'
 ```
 - 게시 전 [[publish-policy]] 게이트: 클레임 검사 → 표시 의무(협찬·광고 표기) → 브랜드 → 플랫폼 정책(해시태그 스팸·중복 도배) → **퀄리티 바 5항목** → 승인 모드. 하나라도 걸리면 게시가 아니라 보강 큐.
-- **게시는 한계 통치** — auto+승인 양식+게이트 통과면 공식 경로(비즈니스 API·Postiz)로 예약 발행까지 자동(전건 로그), 그 외엔 초안·소재·예약 시각까지 준비하고 사람이 올린다. 게시 후 24시간·7일 성과 기록 슬롯을 큐에 넣는다(ANA-16), 성과는 메시지 ID에 귀속([[messages]], ANA-17).
+- **게시는 승인 통치** — 공식 경로(비즈니스 API·Postiz)와 게이트 통과 여부와 무관하게 초안·소재·예약 시각을 보여주고 사용자 확인 후 예약 발행한다. 게시 후 성과 기록 슬롯도 사용자가 승인한 큐에 넣고, 성과는 메시지 ID에 귀속한다([[messages]], ANA-17).
 - 반응이 좋으면 파생 확장은 [[repurpose]], 광고로 밀 값어치가 있는지는 [[ads]]가 판정한다.
 
 ## 출력

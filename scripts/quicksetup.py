@@ -12,7 +12,7 @@
 
 마진율은 '나중에'가 허용되지만, 없으면 손익분기 ROAS·허용 CAC·최소 테스트 예산이 계산되지 않아
 **돈 계산 기능이 제한된다**(광고 제안이 전부 '확인 필요'로 격하). 마지막에 아침 큐·주간 판정·
-월간 리뷰 **루틴 등록을 묻지 않고 기본 수행**한다(--no-routine 으로만 생략).
+월간 리뷰 루틴은 `--enable-routine`을 명시한 경우에만 등록 안내를 낸다.
 """
 import argparse
 import json
@@ -49,7 +49,7 @@ GUIDE = """=== AI 마케팅 운영자(Marketing Copilot) 반자동 설정 ===
     awareness(인지도) / launch(신제품·프로모션) / retention(재구매)  ← 여러 개 고르지 않습니다(우선순위 강제)
  4. 채널 (--channels-active 지금 운영 중 / --channels-wanted 새로 시작하고 싶은 것, 쉼표 구분):
     예 instagram,blog,tiktok,naver,youtube,community
- 5. 실행 권한 + 승인 모드 (--approval-mode): auto(승인 없이) / batch(묶어서) / per_item(건별) /
+ 5. 실행 권한 + 승인 모드 (--approval-mode): auto(읽기·계산·대화 내 초안만) / batch(묶어서) / per_item(건별) /
     draft_only(초안만) / escalate(권한 밖 상신)   기본은 초안+승인.
     광고비는 별도 상한: --ads-budget-cap 500000 (월 상한, 0이면 광고 기능 잠금)
     권한 밖 기준: --escalate-rules "포지셔닝 변경, 가격 변경, 경쟁사 비교 광고"
@@ -70,8 +70,7 @@ GUIDE = """=== AI 마케팅 운영자(Marketing Copilot) 반자동 설정 ===
 
 값 하나만 고칠 땐: python3 scripts/set_config.py me.approval_mode=per_item
 
-설정 저장 후 아침 큐·주간 판정·월간 리뷰 **루틴 등록을 기본으로 진행**합니다
-(묻지 않음 — 루틴은 옵션이 아니라 뼈대. 생략은 --no-routine 뿐)."""
+설정 저장 후 루틴은 자동 등록하지 않습니다. 원하면 `--enable-routine`으로 별도 요청하세요."""
 
 
 def valid_webhook(url):
@@ -158,7 +157,7 @@ def print_gate_status(cfg):
 
 
 def print_routine_default(cfg):
-    """루틴 등록은 옵션이 아니라 기본 동작 — 묻지 않고 진행한다(--no-routine 만 예외).
+    """명시적으로 요청된 경우에만 루틴 등록 레시피를 보여준다.
     이 스크립트에는 스케줄러가 없으므로 ①클로드에 스케줄 도구가 있으면 지금 바로 등록하라는
     지시를 출력하고(등록 후 brief.routine_enabled=true 저장) ②없는 환경이면 schedule_brief.py
     레시피를 안내한다. 상태는 config brief.routine_enabled 로 기록된다."""
@@ -169,12 +168,12 @@ def print_routine_default(cfg):
     except Exception:
         recipes, human = [], str
     brief = cfg.get("brief", {})
-    print("\n[루틴 등록 — 기본 진행] 매일 자동은 옵션이 아니라 뼈대입니다(묻지 않음, 거부 시 --no-routine).")
+    print("\n[루틴 등록 — 명시적 요청] 아래 3개를 등록하기 전에 시간·전달 채널을 확인하세요.")
     for _kind, r in recipes:
         cron = brief.get(r["cfg_key"]) or r["cron"]
         print(f"  · {r['title']}: {human(cron)}  (크론식 {cron}, 스킬 /{r['skill']})")
     print("  → 클로드: 스케줄 도구(scheduled-tasks/클라우드 루틴)가 있으면 위 3개를 지금 바로 등록하고")
-    print("    (사용자에게 다시 묻지 말 것 — 명시적 거부일 때만 생략) 등록 완료 후 실행:")
+    print("    사용자 승인 후 등록하고, 등록 완료 후 실행:")
     print('      python3 "$CLAUDE_PLUGIN_ROOT/scripts/set_config.py" brief.routine_enabled=true')
     print("  → 스케줄 도구가 없는 환경이면 레시피 출력: python3 scripts/schedule_brief.py --kind morning")
     print("  ⚠️ 무인 실행에서도 게시·소재 발주·광고 집행은 자동으로 나가지 않습니다(승인 모드 유지).")
@@ -208,7 +207,9 @@ def main():
     ap.add_argument("--team", default="", help="팀 공유 슬랙 웹훅 URL(선택)")
     ap.add_argument("--no-test", action="store_true", help="테스트 메시지 발송 생략")
     ap.add_argument("--no-routine", action="store_true",
-                    help="루틴 등록 기본 수행 생략(루틴은 기본값 — 명시적으로 거부할 때만)")
+                    help="호환 옵션: 루틴 등록 안내 생략")
+    ap.add_argument("--enable-routine", action="store_true",
+                    help="승인된 루틴 등록 안내를 출력")
     ap.add_argument("--guide", action="store_true", help="질문 7개 안내만 출력")
     args = ap.parse_args()
 
@@ -253,6 +254,7 @@ def main():
         cfg = json.load(f)
 
     me = cfg.setdefault("me", {})
+    me.setdefault("approval_mode", "draft_only")
     for key, val in (("name", args.name), ("role", args.role), ("title", args.title),
                      ("functions", funcs or None), ("approval_mode", args.approval_mode),
                      ("escalate_rules", split_list(args.escalate_rules) or None)):
@@ -385,12 +387,12 @@ def main():
             print("  → 두 채널의 라벨이 서로 바뀌어 도착했다면 웹훅 2개를 맞바꿔 저장하세요"
                   "(마진·예산이 팀 채널로 새는 사고를 막습니다).")
 
-    # 5) 루틴 등록 — 기본 수행. 묻지 않는다. --no-routine(명시적 거부)일 때만 생략.
-    if args.no_routine:
-        print("\n[루틴] --no-routine 지정 — 등록 생략(brief.routine_enabled=false 유지). "
-              "나중에 /routine 으로 언제든 등록.")
-    else:
+    # 5) 루틴 등록은 별도 명시 요청일 때만 안내한다.
+    if args.enable_routine and not args.no_routine:
         print_routine_default(cfg)
+    else:
+        print("\n[루틴] 자동 등록하지 않았습니다(brief.routine_enabled=false 유지). "
+              "원하면 --enable-routine 또는 /routine으로 시간·채널을 확인한 뒤 등록하세요.")
 
     print("\n다음 할 일:")
     print("  1) 점검: python3 scripts/doctor.py  (남은 설정·측정 커버리지를 ✅/⚠️ 로)")
